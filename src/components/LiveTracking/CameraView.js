@@ -401,7 +401,7 @@ const CameraView = () => {
           justifyContent="space-between"
           sx={{ background: "black", padding: 2 }}
         >
-          <Grid item md={8} xs={12} container>
+          <Grid item sx={8} container>
             <Typography
               sx={{ fontWeight: "bold", marginRight: 10 }}
               color="teal"
@@ -468,7 +468,7 @@ const CameraView = () => {
         <Divider sx={{ marginY: 2 }} />
 
         <Grid container spacing={2} sx={{ height: "100vh" }}>
-          <Grid item md={8} xs={12}>
+          <Grid item xs={8} >
             <Box
               id="videoContainer"
               sx={{
@@ -578,7 +578,7 @@ const CameraView = () => {
             </Grid>
           </Grid>
 
-          <Grid item xs={6} md={2}>
+          <Grid item xs={2}>
             <Box
               sx={{
                 backgroundColor: isNightMode ? "#444" : "#fff",
@@ -641,7 +641,7 @@ const CameraView = () => {
             </Box>
           </Grid>
 
-          <Grid item xs={6} md={2}>
+          <Grid item xs={2}>
             <Box
               sx={{
                 backgroundColor: isNightMode ? "#444" : "#fff",
@@ -764,13 +764,13 @@ const CameraView = () => {
                 Last 3 Details
               </Typography>
               <Grid container justifyContent="space-between">
-                <Grid item xs={12} md={6}>
+                <Grid item  xs={6}>
                   <Typography variant="body1" textAlign="center" color="#00E5FF">
                     {" "}
                     Location
                   </Typography>
                 </Grid>
-                <Grid item xs={12} md={6}>
+                <Grid item  xs={6}>
                   <Typography variant="body1" textAlign="center" color="#00E5FF">
                     {" "}
                     PantoHeight
@@ -779,28 +779,28 @@ const CameraView = () => {
               </Grid>
               <Divider sx={{marginY:1}} />
               <Grid container justifyContent="space-between">
-                <Grid item xs={12} md={6}>
+                <Grid item xs={6}>
                   <Typography textAlign="center"> Loc 1</Typography>
                 </Grid>
-                <Grid item xs={12} md={6}>
+                <Grid item  xs={6}>
                   <Typography textAlign="center">00</Typography>
                 </Grid>
               </Grid>
               <Divider  />
               <Grid container justifyContent="space-between">
-                <Grid item xs={12} md={6}>
+                <Grid item  xs={6}>
                   <Typography textAlign="center"> Loc 2</Typography>
                 </Grid>
-                <Grid item xs={12} md={6}>
+                <Grid item  xs={6}>
                   <Typography textAlign="center"> 00</Typography>
                 </Grid>
               </Grid>
               <Divider  />
               <Grid container justifyContent="space-between">
-                <Grid item xs={12} md={6}>
+                <Grid item  xs={6}>
                   <Typography textAlign="center"> Loc 3</Typography>
                 </Grid>
-                <Grid item xs={12} md={6}>
+                <Grid item  xs={6}>
                   <Typography textAlign="center"> 00</Typography>
                 </Grid>
               </Grid>
