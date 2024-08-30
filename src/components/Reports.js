@@ -3,7 +3,7 @@ import { Typography, Box } from '@mui/material';
 
 const Reports = () => {
     return (
-        <Box>
+        <Box sx={{paddingTop:7}}>
             <Typography variant="h2" gutterBottom>
                 Welcome to Reports
             </Typography>

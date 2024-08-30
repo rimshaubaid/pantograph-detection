@@ -20,7 +20,7 @@ import {
 
 const UploadRouteData = () => {
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="lg" sx={{paddingTop:7}}>
       <Paper sx={{ padding: 2, backgroundColor: '#333', color: '#fff' }}>
         <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
           Upload Route Data

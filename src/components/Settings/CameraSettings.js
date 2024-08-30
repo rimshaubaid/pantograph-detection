@@ -40,6 +40,7 @@ const CameraSettings = () => {
         backgroundColor: '#333',
         color: '#fff',
         padding: '20px',
+        paddingTop:10
       }}
     >
       <Typography variant="h4" sx={{ marginBottom: 4, fontWeight: 'bold', color: '#00E5FF' }}>
@@ -107,7 +108,7 @@ const CameraSettings = () => {
           justifyContent: 'center',
           backgroundColor: '#000',
           width: '80%',
-          height: '450px',
+          height: '50vh',
           borderRadius: '4px',
         }}
       >

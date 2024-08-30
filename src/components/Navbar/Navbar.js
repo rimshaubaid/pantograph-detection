@@ -37,7 +37,7 @@ const Navbar = () => {
   };
 
   return (
-    <AppBar position="absolute">
+    <AppBar position="absolute" >
       <Toolbar>
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
           

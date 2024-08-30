@@ -30,7 +30,7 @@ const TechoSensor = () => {
   };
 
   return (
-    <Box sx={{ width: "100%", backgroundColor: "#333", height:"100vh"}}>
+    <Box sx={{ width: "100%", backgroundColor: "#333", height:"100vh",paddingTop:10}}>
       <Box
         sx={{
           width: "100%",

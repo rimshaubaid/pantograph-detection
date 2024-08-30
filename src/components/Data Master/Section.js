@@ -12,7 +12,7 @@ const sections = [
 
 const SectionManagement = () => {
   return (
-    <Container sx={{ mt: 4 }}>
+    <Container sx={{ mt: 4,paddingTop:7  }}>
       <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
         <Typography variant="h5" gutterBottom>
           Create/Edit Section

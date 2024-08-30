@@ -24,7 +24,7 @@ const SparkDataView = () => {
   };
 
   return (
-    <Box sx={{ padding: 4, bgcolor: '#1c1c1c', minHeight: '100vh', color: '#fff' }}>
+    <Box sx={{ padding: 4, bgcolor: '#1c1c1c', minHeight: '100vh', color: '#fff',paddingTop:7 }}>
       <Typography variant="h5" sx={{ marginBottom: 4, color: '#00E5FF' }}>
         View Data
       </Typography>

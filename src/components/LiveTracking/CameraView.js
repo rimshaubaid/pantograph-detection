@@ -78,18 +78,50 @@ const CameraView = () => {
 
   useEffect(() => {
     const fetchFrames = async () => {
+      setIsLoading(true);
+  
+      const formData = new FormData();
+      // Replace with your actual video file or handle it via user input
+      formData.append("video", videoFile); // Ensure videoFile is defined
+  
       try {
-        const url = "http://127.0.0.1:5000/process-camera-feed";
-        
-        // Fetch the frames from the API
-        const response = await axios.post(url);
-        
-        // Set the frames in state
-        setFrames(response.data);
+        const response = await fetch("http://81.208.170.168:5100/process-camera-feed", {
+          method: "POST",
+          body: formData,
+        });
+  
+        if (!response.body) {
+          throw new Error("ReadableStream not supported or no body in response");
+        }
+  
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+  
+        // Process the stream
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+  
+          buffer += decoder.decode(value, { stream: true });
+         // console.log('buffer',buffer)
+          // Split buffer by newlines to get frames
+          const frames = buffer.split('\n');
+          buffer = frames.pop(); // Keep any incomplete frame in buffer
+  
+          frames.forEach(frame => {
+            if (frame) setFrames(frame); // Update state with new frame
+          });
+        }
+  
+        setIsLoading(false);
+  
       } catch (error) {
-        console.error('Error fetching video frames:', error);
+        console.error('Error processing video:', error);
+        setIsLoading(false);
       }
     };
+   
 
     fetchFrames();
   }, []);
@@ -488,11 +520,11 @@ const CameraView = () => {
                   </Typography>
                 </Box>
               ) : (
-                frames.length > 0 && (
+                frames && (
                   <img
                     id="webcam"
                     style={{ width: "100%", height: "100%" }}
-                    src={`data:image/jpeg;base64,${frames[0]}`}
+                    src={`data:image/jpeg;base64,${frames}`}
                     alt="Camera Feed"
                   />
                 )

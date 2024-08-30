@@ -5,11 +5,10 @@ import { Outlet } from "react-router-dom";
 
 const Layout = () => {
   return (
-    <Grid sx={{overflow:"hidden",height:"100vh"}}>
+    <Grid sx={{ overflow: "hidden", height: "100vh" }}>
       <Navbar />
-    
-        <Outlet />
-  
+
+      <Outlet />
     </Grid>
   );
 };
