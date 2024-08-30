@@ -58,7 +58,7 @@ const SparkDataView = () => {
                   <TableRow>
                     <TableCell>S.No</TableCell>
                     <TableCell>OHE Height</TableCell>
-                    <TableCell>Stagger</TableCell>
+                    <TableCell>CP</TableCell>
                     <TableCell>Gradient</TableCell>
                     <TableCell>IOL</TableCell>
                     <TableCell>UIOL</TableCell>

@@ -5,7 +5,7 @@ import { Outlet } from "react-router-dom";
 
 const Layout = () => {
   return (
-    <Grid>
+    <Grid sx={{overflow:"hidden",height:"100vh"}}>
       <Navbar />
     
         <Outlet />

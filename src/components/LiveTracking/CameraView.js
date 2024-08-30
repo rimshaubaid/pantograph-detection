@@ -216,11 +216,11 @@ const CameraView = () => {
   return (
     <Box
       sx={{
-        // height: "100vh",
+      
         display: "flex",
         flexDirection: "column",
-
-        // overflow: "hidden",
+         paddingTop:7,
+         overflow: "hidden",
       }}
     >
       <Dialog open={openModal} onClose={() => setOpenModal(false)} fullWidth>
@@ -387,6 +387,7 @@ const CameraView = () => {
         sx={{
           flex: 1,
           padding: 2,
+        
           display: "flex",
           flexDirection: "column",
           backgroundColor: isNightMode ? "#333" : "#f5f5f5",
@@ -473,7 +474,7 @@ const CameraView = () => {
               sx={{
                 position: "relative",
                 backgroundColor: "#000",
-                height: "69vh",
+                height: "50vh",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -601,39 +602,39 @@ const CameraView = () => {
               >
                 <CameraAlt sx={{ fontSize: 60, color: "gray" }} />
               </Box>
-              <Box sx={{ display: "flex", alignItems: "center", marginY: 2 }}>
+              <Box sx={{ display: "flex", alignItems: "center", marginY: 1 }}>
                 <AccessTime sx={{ marginRight: 1 }} />
-                <Typography>Time: YYYY-MM-DD HH:mm:ss</Typography>
+                <Typography variant="body2">Time: YYYY-MM-DD HH:mm:ss</Typography>
               </Box>
-              <Box sx={{ display: "flex", alignItems: "center", marginTop: 2 }}>
+              <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                 <LocationOn sx={{ marginRight: 1 }} />
                 <Typography variant="body2">Location: 00</Typography>
               </Box>
-              <Box sx={{ display: "flex", alignItems: "center", marginTop: 2 }}>
+              <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                 <Height sx={{ marginRight: 1 }} />
                 <Typography variant="body2">OHE Height: 00</Typography>
               </Box>
-              <Box sx={{ display: "flex", alignItems: "center", marginTop: 2 }}>
+              <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                 <Straighten sx={{ marginRight: 1 }} />
-                <Typography variant="body2">Stagger 1: 00</Typography>
+                <Typography variant="body2">CP 1: 00</Typography>
               </Box>
-              <Box sx={{ display: "flex", alignItems: "center", marginTop: 2 }}>
+              <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                 <Straighten sx={{ marginRight: 1 }} />
-                <Typography variant="body2">Stagger 2: 00</Typography>
+                <Typography variant="body2">CP 2: 00</Typography>
               </Box>
-              <Box sx={{ display: "flex", alignItems: "center", marginTop: 2 }}>
+              <Box sx={{ display: "flex", alignItems: "center", marginTop: 1}}>
                 <Straighten sx={{ marginRight: 1 }} />
-                <Typography variant="body2">Stagger 3: 00</Typography>
+                <Typography variant="body2">CP 3: 00</Typography>
               </Box>
-              <Box sx={{ display: "flex", alignItems: "center", marginTop: 2 }}>
+              <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                 <Straighten sx={{ marginRight: 1 }} />
-                <Typography variant="body2">Stagger 4: 00</Typography>
+                <Typography variant="body2">CP 4: 00</Typography>
               </Box>
-              <Box sx={{ display: "flex", alignItems: "center", marginTop: 2 }}>
+              <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                 <Straighten sx={{ marginRight: 1 }} />
-                <Typography variant="body2">Stagger 5: 00</Typography>
+                <Typography variant="body2">CP 5: 00</Typography>
               </Box>
-              <Box sx={{ display: "flex", alignItems: "center", marginTop: 2 }}>
+              <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                 <FlashOn sx={{ marginRight: 1 }} />
                 <Typography variant="body2">IMP: 00</Typography>
               </Box>
@@ -686,7 +687,7 @@ const CameraView = () => {
                 sx={{
                   display: "flex",
                   justifyContent: "space-between",
-                  marginY: 2,
+                  marginY: 1,
                 }}
               >
                 <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -700,7 +701,7 @@ const CameraView = () => {
                 sx={{
                   display: "flex",
                   justifyContent: "space-between",
-                  marginY: 2,
+                  marginY: 1,
                 }}
               >
                 <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -714,7 +715,7 @@ const CameraView = () => {
                 sx={{
                   display: "flex",
                   justifyContent: "space-between",
-                  marginY: 2,
+                  marginY: 1,
                 }}
               >
                 <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -728,7 +729,7 @@ const CameraView = () => {
                 sx={{
                   display: "flex",
                   justifyContent: "space-between",
-                  marginY: 2,
+                  marginY: 1,
                 }}
               >
                 <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -742,7 +743,7 @@ const CameraView = () => {
                 sx={{
                   display: "flex",
                   justifyContent: "space-between",
-                  marginY: 2,
+                  marginY: 1,
                 }}
               >
                 <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -754,29 +755,29 @@ const CameraView = () => {
               <Typography
                 variant="body1"
                 sx={{
-                  fontWeight: "700",
+                  fontWeight: "900",
                   textAlign: "center",
                   margin: "16px 0",
-                  fontSize: 20,
+                  fontSize: 15,
                 }}
               >
                 Last 3 Details
               </Typography>
               <Grid container justifyContent="space-between">
                 <Grid item xs={12} md={6}>
-                  <Typography textAlign="center" color="#00E5FF">
+                  <Typography variant="body1" textAlign="center" color="#00E5FF">
                     {" "}
                     Location
                   </Typography>
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  <Typography textAlign="center" color="#00E5FF">
+                  <Typography variant="body1" textAlign="center" color="#00E5FF">
                     {" "}
-                    Panto Height
+                    PantoHeight
                   </Typography>
                 </Grid>
               </Grid>
-              <Divider sx={{ marginY: 1 }} />
+              <Divider sx={{marginY:1}} />
               <Grid container justifyContent="space-between">
                 <Grid item xs={12} md={6}>
                   <Typography textAlign="center"> Loc 1</Typography>
@@ -785,7 +786,7 @@ const CameraView = () => {
                   <Typography textAlign="center">00</Typography>
                 </Grid>
               </Grid>
-              <Divider sx={{ marginY: 1 }} />
+              <Divider  />
               <Grid container justifyContent="space-between">
                 <Grid item xs={12} md={6}>
                   <Typography textAlign="center"> Loc 2</Typography>
@@ -794,7 +795,7 @@ const CameraView = () => {
                   <Typography textAlign="center"> 00</Typography>
                 </Grid>
               </Grid>
-              <Divider sx={{ marginY: 1 }} />
+              <Divider  />
               <Grid container justifyContent="space-between">
                 <Grid item xs={12} md={6}>
                   <Typography textAlign="center"> Loc 3</Typography>
