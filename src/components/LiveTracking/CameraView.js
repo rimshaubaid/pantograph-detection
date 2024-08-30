@@ -73,12 +73,12 @@ const CameraView = () => {
   const [openResumeDialog, setOpenResumeDialog] = useState(false);
   const [openNavigateDialog, setOpenNavigateDialog] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
-
+ // const [loading,setLoading] = useState()
   const [frames, setFrames] = useState([]);
 
   useEffect(() => {
     const fetchFrames = async () => {
-      setIsLoading(true);
+     // setIsLoading(true);
   
      
   
@@ -112,11 +112,11 @@ const CameraView = () => {
           });
         }
   
-        setIsLoading(false);
+       // setIsLoading(false);
   
       } catch (error) {
         console.error('Error processing video:', error);
-        setIsLoading(false);
+       // setIsLoading(false);
       }
     };
    
@@ -541,15 +541,13 @@ const CameraView = () => {
                   {isFullScreen ? <FullscreenExit /> : <Fullscreen />}
                 </IconButton>
               </Box>
-              <Box sx={{ position: "absolute", top: 10, left: 10 }}>
-                {/* <Typography variant="h6" sx={{ color: "white" }}>
-                  Live Intensity: <span style={{ color: "teal",fontWeight:"600" }}>00</span>
-                </Typography> */}
+              {/* <Box sx={{ position: "absolute", top: 10, left: 10 }}>
+              
                 <Typography variant="h6" sx={{ color: "white" }}>
                   Time:{" "}
                   <span style={{ color: "teal", fontWeight: 800 }}>00</span>
                 </Typography>
-              </Box>
+              </Box> */}
             </Box>
 
             <Typography
