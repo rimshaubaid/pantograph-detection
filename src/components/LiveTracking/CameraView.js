@@ -80,14 +80,12 @@ const CameraView = () => {
     const fetchFrames = async () => {
       setIsLoading(true);
   
-      const formData = new FormData();
-      // Replace with your actual video file or handle it via user input
-      formData.append("video", videoFile); // Ensure videoFile is defined
+     
   
       try {
-        const response = await fetch("http://81.208.170.168:5100/process-camera-feed", {
+        const response = await fetch("http://127.0.0.1:5000/process-camera-feed", {
           method: "POST",
-          body: formData,
+         // body: formData,
         });
   
         if (!response.body) {
