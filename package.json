@@ -16,6 +16,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.7.5",
+    "child_process": "^1.0.2",
     "electron-is-dev": "^3.0.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -62,11 +63,21 @@
     "appId": "com.example.electron-cra",
     "files": [
       "build/**/*",
+      "python/**/*",
       "electron.js",
       "preload.js",
       "index.html",
       "node_modules/**/*",
       "public/electron.js"
+    ],
+    "extraResources": [
+      {
+        "from": "python/",
+        "to": "python/",
+        "filter": [
+          "**/*"
+        ]
+      }
     ],
     "directories": {
       "buildResources": "assets",

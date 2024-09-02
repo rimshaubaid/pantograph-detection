@@ -24,12 +24,13 @@ async function createWindow() {
     mainWindow.webContents.on("devtools-opened", () => {
         mainWindow.webContents.closeDevTools();
     });
-    mainWindow.loadURL(isDev ? `http://localhost:3000` : `file://${__dirname}/../build/index.html`);
+    mainWindow.loadURL(`file://${__dirname}/../build/index.html`);
           mainWindow.on("closed", () => (mainWindow = null));
     // mainWindow.loadURL(isDev
     //     ? 'http://localhost:3000'
     //     : `file://${path.join(__dirname, '../build/index.html')}`);
-
+ // Start the Python backend when the window is created
+// startPythonBackend();
 }
 
 app.whenReady().then(createWindow);

@@ -83,7 +83,7 @@ const CameraView = () => {
      
   
       try {
-        const response = await fetch("http://127.0.0.1:5000/process-camera-feed", {
+        const response = await fetch("http://81.208.170.168:5100/process-camera-feed", {
           method: "POST",
          // body: formData,
         });
@@ -246,7 +246,7 @@ const CameraView = () => {
   return (
     <Box
       sx={{
-      
+   
         display: "flex",
         flexDirection: "column",
          paddingTop:7,
@@ -435,22 +435,25 @@ const CameraView = () => {
             <Typography
               sx={{ fontWeight: "bold", marginRight: 10 }}
               color="teal"
+              style={{ fontSize: '1vw' }}
             >
               TRAIN/LOCO NO. {formValues.trainNo}
             </Typography>
             <Typography
               sx={{ fontWeight: "bold", marginRight: 10 }}
               color="teal"
+              style={{ fontSize: '1vw' }}
             >
               ROUTE: {formValues.route} | LINE : {formValues.line}
             </Typography>
             <Typography
               sx={{ fontWeight: "bold", marginRight: 10 }}
               color="teal"
+              style={{ fontSize: '1vw' }}
             >
               Section:
             </Typography>
-            <Typography sx={{ fontWeight: "bold" }} color="teal">
+            <Typography sx={{ fontWeight: "bold" }} color="teal" style={{ fontSize: '1vw' }}>
               TRD Feature:
             </Typography>
           </Grid>
@@ -459,6 +462,7 @@ const CameraView = () => {
               textAlign="center"
               sx={{ fontWeight: "bold" }}
               color="teal"
+              style={{ fontSize: '1vw' }}
             >
               ENG. FEATURE
             </Typography>
@@ -477,21 +481,21 @@ const CameraView = () => {
               checked={isNightMode}
               onChange={() => setIsNightMode(!isNightMode)}
             />
-            <Typography variant="body1" component="span">
+            <Typography  style={{ fontSize: '1vw' }} component="span">
               {isNightMode ? "Night Mode" : "Day Mode"}
             </Typography>
           </Grid>
           <Grid item xs={2}>
             <Switch checked={isGPS} onChange={() => setIsGPS(!isGPS)} />
-            <Typography variant="body1" component="span">
+            <Typography style={{ fontSize: '1vw' }} component="span">
               GPS
             </Typography>
           </Grid>
           <Grid item xs={2}>
-            <Typography>Recording: {isRecording ? "ON" : "OFF"}</Typography>
+            <Typography style={{ fontSize: '1vw' }}>Recording: {isRecording ? "ON" : "OFF"}</Typography>
           </Grid>
           <Grid item xs={2}>
-            <Typography>Time: HH:MM</Typography>
+            <Typography style={{ fontSize: '1vw' }}>Time: HH:MM</Typography>
           </Grid>
         </Grid>
 
@@ -551,7 +555,7 @@ const CameraView = () => {
             </Box>
 
             <Typography
-              variant="h6"
+    style={{ fontSize: '2vw' }} 
               textAlign="center"
               fontWeight={800}
               sx={{ color: isNightMode ? "#ccc" : "#000", marginTop: 3 }}
@@ -616,7 +620,7 @@ const CameraView = () => {
                 border: "2px solid teal",
               }}
             >
-              <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+              <Typography style={{ fontSize: '2vw' }} sx={{ fontWeight: "bold" }}>
                 Last Details
               </Typography>
 
@@ -632,39 +636,39 @@ const CameraView = () => {
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", marginY: 1 }}>
                 <AccessTime sx={{ marginRight: 1 }} />
-                <Typography variant="body2">Time: YYYY-MM-DD HH:mm:ss</Typography>
+                <Typography style={{ fontSize: '1vw' }} >Time: YYYY-MM-DD HH:mm:ss</Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                 <LocationOn sx={{ marginRight: 1 }} />
-                <Typography variant="body2">Location: 00</Typography>
+                <Typography  style={{ fontSize: '1vw' }}>Location: 00</Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                 <Height sx={{ marginRight: 1 }} />
-                <Typography variant="body2">OHE Height: 00</Typography>
+                <Typography  style={{ fontSize: '1vw' }}>OHE Height: 00</Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                 <Straighten sx={{ marginRight: 1 }} />
-                <Typography variant="body2">CP 1: 00</Typography>
+                <Typography  style={{ fontSize: '1vw' }}>CP 1: 00</Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                 <Straighten sx={{ marginRight: 1 }} />
-                <Typography variant="body2">CP 2: 00</Typography>
+                <Typography  style={{ fontSize: '1vw' }}>CP 2: 00</Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", marginTop: 1}}>
                 <Straighten sx={{ marginRight: 1 }} />
-                <Typography variant="body2">CP 3: 00</Typography>
+                <Typography  style={{ fontSize: '1vw' }}>CP 3: 00</Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                 <Straighten sx={{ marginRight: 1 }} />
-                <Typography variant="body2">CP 4: 00</Typography>
+                <Typography  style={{ fontSize: '1vw' }}>CP 4: 00</Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                 <Straighten sx={{ marginRight: 1 }} />
-                <Typography variant="body2">CP 5: 00</Typography>
+                <Typography  style={{ fontSize: '1vw' }}>CP 5: 00</Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                 <FlashOn sx={{ marginRight: 1 }} />
-                <Typography variant="body2">IMP: 00</Typography>
+                <Typography  style={{ fontSize: '1vw' }}>IMP: 00</Typography>
               </Box>
             </Box>
           </Grid>
@@ -680,14 +684,14 @@ const CameraView = () => {
               }}
             >
               <Typography
-                variant="h6"
+     style={{ fontSize: '2vw' }} 
                 textAlign="center"
                 sx={{ fontWeight: "bold" }}
               >
                 Speed
               </Typography>
               <Typography
-                variant="h6"
+     style={{ fontSize: '2vw' }} 
                 sx={{
                   fontWeight: "bold",
                   textAlign: "center",
@@ -706,9 +710,9 @@ const CameraView = () => {
               >
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                   <AccessTime sx={{ marginRight: 1 }} />
-                  <Typography variant="body2">Time Elapsed</Typography>
+                  <Typography  style={{ fontSize: '1vw' }}>Time Elapsed</Typography>
                 </Box>
-                <Typography variant="body2">00</Typography>
+                <Typography  style={{ fontSize: '1vw' }}>00</Typography>
               </Box>
 
               <Box
@@ -720,9 +724,9 @@ const CameraView = () => {
               >
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                   <DirectionsWalk sx={{ marginRight: 1 }} />
-                  <Typography variant="body2">Distance Traveled</Typography>
+                  <Typography  style={{ fontSize: '1vw' }}>Distance Traveled</Typography>
                 </Box>
-                <Typography variant="body2">00</Typography>
+                <Typography  style={{ fontSize: '1vw' }}>00</Typography>
               </Box>
 
               <Box
@@ -734,9 +738,9 @@ const CameraView = () => {
               >
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                   <Satellite sx={{ marginRight: 1 }} />
-                  <Typography variant="body2">Satellites</Typography>
+                  <Typography  style={{ fontSize: '1vw' }}>Satellites</Typography>
                 </Box>
-                <Typography variant="body2">0</Typography>
+                <Typography  style={{ fontSize: '1vw' }}>0</Typography>
               </Box>
 
               <Box
@@ -748,9 +752,9 @@ const CameraView = () => {
               >
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                   <Explore sx={{ marginRight: 1 }} />
-                  <Typography variant="body2">Longitude</Typography>
+                  <Typography  style={{ fontSize: '1vw' }}>Longitude</Typography>
                 </Box>
-                <Typography variant="body2">0</Typography>
+                <Typography  style={{ fontSize: '1vw' }}>0</Typography>
               </Box>
 
               <Box
@@ -762,9 +766,9 @@ const CameraView = () => {
               >
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                   <Explore sx={{ marginRight: 1 }} />
-                  <Typography variant="body2">Latitude</Typography>
+                  <Typography  style={{ fontSize: '1vw' }}>Latitude</Typography>
                 </Box>
-                <Typography variant="body2">0</Typography>
+                <Typography  style={{ fontSize: '1vw' }}>0</Typography>
               </Box>
 
               <Box
@@ -776,12 +780,12 @@ const CameraView = () => {
               >
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                   <Height sx={{ marginRight: 1 }} />
-                  <Typography variant="body2">Altitude</Typography>
+                  <Typography  style={{ fontSize: '1vw' }}>Altitude</Typography>
                 </Box>
-                <Typography variant="body2">0</Typography>
+                <Typography  style={{ fontSize: '1vw' }}>0</Typography>
               </Box>
               <Typography
-                variant="body1"
+             style={{ fontSize: '1vw' }}
                 sx={{
                   fontWeight: "900",
                   textAlign: "center",
@@ -793,13 +797,13 @@ const CameraView = () => {
               </Typography>
               <Grid container justifyContent="space-between">
                 <Grid item  xs={6}>
-                  <Typography variant="body1" textAlign="center" color="#00E5FF">
+                  <Typography style={{ fontSize: '1vw' }} textAlign="center" color="#00E5FF">
                     {" "}
                     Location
                   </Typography>
                 </Grid>
                 <Grid item  xs={6}>
-                  <Typography variant="body1" textAlign="center" color="#00E5FF">
+                  <Typography  style={{ fontSize: '1vw' }} textAlign="center" color="#00E5FF">
                     {" "}
                     PantoHeight
                   </Typography>
@@ -808,28 +812,28 @@ const CameraView = () => {
               <Divider sx={{marginY:1}} />
               <Grid container justifyContent="space-between">
                 <Grid item xs={6}>
-                  <Typography textAlign="center"> Loc 1</Typography>
+                  <Typography  style={{ fontSize: '1vw' }} textAlign="center"> Loc 1</Typography>
                 </Grid>
                 <Grid item  xs={6}>
-                  <Typography textAlign="center">00</Typography>
-                </Grid>
-              </Grid>
-              <Divider  />
-              <Grid container justifyContent="space-between">
-                <Grid item  xs={6}>
-                  <Typography textAlign="center"> Loc 2</Typography>
-                </Grid>
-                <Grid item  xs={6}>
-                  <Typography textAlign="center"> 00</Typography>
+                  <Typography  style={{ fontSize: '1vw' }} textAlign="center">00</Typography>
                 </Grid>
               </Grid>
               <Divider  />
               <Grid container justifyContent="space-between">
                 <Grid item  xs={6}>
-                  <Typography textAlign="center"> Loc 3</Typography>
+                  <Typography  style={{ fontSize: '1vw' }} textAlign="center"> Loc 2</Typography>
                 </Grid>
                 <Grid item  xs={6}>
-                  <Typography textAlign="center"> 00</Typography>
+                  <Typography  style={{ fontSize: '1vw' }} textAlign="center"> 00</Typography>
+                </Grid>
+              </Grid>
+              <Divider  />
+              <Grid container justifyContent="space-between">
+                <Grid item  xs={6}>
+                  <Typography  style={{ fontSize: '1vw' }} textAlign="center"> Loc 3</Typography>
+                </Grid>
+                <Grid item  xs={6}>
+                  <Typography  style={{ fontSize: '1vw' }} textAlign="center"> 00</Typography>
                 </Grid>
               </Grid>
               {/* <Table>
