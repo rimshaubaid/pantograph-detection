@@ -40,7 +40,7 @@ const Navbar = () => {
     <AppBar position="absolute" >
       <Toolbar>
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
-          
+          ATAI
         </Typography>
         <Button color="inherit" component={Link} to="/">
           <Home />

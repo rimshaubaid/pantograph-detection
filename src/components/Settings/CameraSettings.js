@@ -6,6 +6,7 @@ const CameraSettings = () => {
   const [camera, setCamera] = useState('');
   const [resolution, setResolution] = useState('');
   const [cameras, setCameras] = useState([]);
+  const [videoStream, setVideoStream] = useState(null);
 
   useEffect(() => {
     // Fetch the list of connected cameras
@@ -21,6 +22,43 @@ const CameraSettings = () => {
 
     getCameras();
   }, []);
+
+  useEffect(() => {
+    // Fetch the resolution when a camera is selected
+    const getResolution = async () => {
+      if (camera) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: { deviceId: camera }
+          });
+          const videoTrack = stream.getVideoTracks()[0];
+          const settings = videoTrack.getSettings();
+
+          // Automatically set the resolution based on camera settings
+          if (settings.width && settings.height) {
+            const resolutionLabel = `${settings.height}p`;
+            setResolution(resolutionLabel);
+          }
+          
+          setVideoStream(stream);  // Set the video stream for live video
+        } catch (error) {
+          console.error('Error accessing camera stream.', error);
+        }
+      } else {
+        setResolution('');
+        setVideoStream(null);
+      }
+    };
+
+    getResolution();
+
+    // Cleanup video stream when component unmounts or camera changes
+    return () => {
+      if (videoStream) {
+        videoStream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [camera]);
 
   const handleCameraChange = (event) => {
     setCamera(event.target.value);
@@ -40,7 +78,7 @@ const CameraSettings = () => {
         backgroundColor: '#333',
         color: '#fff',
         padding: '20px',
-        paddingTop:10
+        paddingTop: 10
       }}
     >
       <Typography variant="h4" sx={{ marginBottom: 4, fontWeight: 'bold', color: '#00E5FF' }}>
@@ -88,9 +126,9 @@ const CameraSettings = () => {
             <MenuItem value="">
               <em>None</em>
             </MenuItem>
-            <MenuItem value={720}>720p</MenuItem>
-            <MenuItem value={1080}>1080p</MenuItem>
-            <MenuItem value={1440}>1440p</MenuItem>
+            <MenuItem value="720p">720p</MenuItem>
+            <MenuItem value="1080p">1080p</MenuItem>
+            <MenuItem value="1440p">1440p</MenuItem>
           </Select>
         </FormControl>
         <Button variant="contained" color="primary" sx={{ marginRight: 2, fontWeight: 'bold' }}>
@@ -112,10 +150,22 @@ const CameraSettings = () => {
           borderRadius: '4px',
         }}
       >
-        {camera ? (
-          <Typography variant="h6" sx={{ color: '#00E5FF', fontWeight: 'bold' }}>
-            Camera is connected.
-          </Typography>
+        {camera && videoStream ? (
+          <video
+            autoPlay
+            playsInline
+            ref={(videoElement) => {
+              if (videoElement) {
+                videoElement.srcObject = videoStream;
+              }
+            }}
+            style={{
+              width: '100%',
+              height: '100%',
+              borderRadius: '4px',
+              objectFit: 'cover',
+            }}
+          />
         ) : (
           <>
             <VideocamOff sx={{ fontSize: 100, color: '#00E5FF' }} />
@@ -125,9 +175,9 @@ const CameraSettings = () => {
           </>
         )}
       </Box>
-      <Button variant="contained" color="primary"  sx={{background:"#00E5FF",color:"black",fontWeight:"800",marginTop:5}}>
-          Save Camera Setting
-        </Button>
+      <Button variant="contained" color="primary" sx={{ background: "#00E5FF", color: "black", fontWeight: "800", marginTop: 5 }}>
+        Save Camera Setting
+      </Button>
     </Box>
   );
 };

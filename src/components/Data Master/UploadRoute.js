@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Container,
   Grid,
@@ -19,8 +19,17 @@ import {
 } from '@mui/material';
 
 const UploadRouteData = () => {
+  const [fileName, setFileName] = useState('');
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setFileName(file.name);
+    }
+  };
+
   return (
-    <Container maxWidth="lg" sx={{paddingTop:7}}>
+    <Container maxWidth="lg" sx={{ paddingTop: 7 }}>
       <Paper sx={{ padding: 2, backgroundColor: '#333', color: '#fff' }}>
         <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
           Upload Route Data
@@ -33,10 +42,15 @@ const UploadRouteData = () => {
               sx={{ backgroundColor: '#008080' }}
             >
               Choose File
-              <input type="file" hidden />
+              <input
+                type="file"
+                hidden
+                accept=".xlsx, .xls, .pdf"
+                onChange={handleFileChange}
+              />
             </Button>
             <Typography variant="body2" sx={{ marginTop: 1 }}>
-              No file chosen
+              {fileName ? fileName : 'No file chosen'}
             </Typography>
           </Grid>
           <Grid item xs={12} md={4}>
@@ -48,7 +62,7 @@ const UploadRouteData = () => {
                 sx={{ color: '#fff' }}
               >
                 <MenuItem value="">
-                  <em>-- Select Routes --</em>
+                  <em>-- Select Route --</em>
                 </MenuItem>
                 {/* Add route options here */}
               </Select>

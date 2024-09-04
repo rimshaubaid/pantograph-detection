@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow,Menu } from 'electron';
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import isDev from 'electron-is-dev';
@@ -32,7 +32,7 @@ async function createWindow() {
         protocol: 'file:',
         slashes: true
     }));
-
+    Menu.setApplicationMenu(null);
     mainWindow.on("closed", () => (mainWindow = null));
 
     

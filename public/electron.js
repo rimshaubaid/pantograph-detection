@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow,Menu } from 'electron';
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import isDev from 'electron-is-dev';
@@ -25,6 +25,7 @@ async function createWindow() {
         mainWindow.webContents.closeDevTools();
     });
     mainWindow.loadURL(`file://${__dirname}/../build/index.html`);
+    Menu.setApplicationMenu(null);
           mainWindow.on("closed", () => (mainWindow = null));
     // mainWindow.loadURL(isDev
     //     ? 'http://localhost:3000'

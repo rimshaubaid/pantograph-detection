@@ -34,7 +34,7 @@ import {
   Explore,
   Height,LocationOn,Straighten,
   FlashOn,
-  VideocamOff
+  VideocamOff,SwapHoriz
 } from "@mui/icons-material";
 
 import { useNavigate } from "react-router-dom";
@@ -59,14 +59,11 @@ const CameraView = () => {
     weather: "",
     temperature: "",
   });
-
+  const [formErrors, setFormErrors] = useState({});
+  const [hasSubmitted, setHasSubmitted] = useState(false);
   const videoRef = useRef(null);
 
-  const data = [
-    { location: "Loc 1", altitude: "1000 m" },
-    { location: "Loc 2", altitude: "1500 m" },
-    { location: "Loc 3", altitude: "2000 m" },
-  ];
+
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [openPauseDialog, setOpenPauseDialog] = useState(false);
@@ -210,10 +207,7 @@ const CameraView = () => {
     }));
   };
 
-  const handleSubmit = () => {
-    // Close the modal after submission
-    setOpenModal(false);
-  };
+ 
 
   // useEffect(() => {
   //   const startCamera = async () => {
@@ -243,17 +237,62 @@ const CameraView = () => {
   //   };
   // }, []);
   
+  const validateForm = () => {
+    const errors = {};
+
+    if (!formValues.trainNo) {
+      errors.trainNo = 'This field is required';
+    }
+    if (!formValues.route) {
+      errors.route = 'This field is required';
+    }
+    if (!formValues.line) {
+      errors.line = 'This field is required';
+    }
+    if (!formValues.associatingStaff) {
+      errors.associatingStaff = 'This field is required';
+    }
+    if (!formValues.pantographModel) {
+      errors.pantographModel = 'This field is required';
+    }
+
+    return errors;
+  };
+
+  const handleSubmit = () => {
+    setHasSubmitted(true);
+    const errors = validateForm();
+    setFormErrors(errors);
+
+    if (Object.keys(errors).length === 0) {
+      // Submit form if no errors
+      console.log('Form submitted:', formValues);
+      setOpenModal(false);
+    }
+  };
+
+
   return (
     <Box
       sx={{
-   
         display: "flex",
         flexDirection: "column",
-         paddingTop:7,
-         overflow: "hidden",
+        paddingTop: 7,
+        overflow: "hidden",
       }}
     >
-      <Dialog open={openModal} onClose={() => setOpenModal(false)} fullWidth>
+      <Dialog
+        open={openModal}
+        onClose={(event, reason) => {
+          if (reason !== "backdropClick") {
+            setOpenModal(false);
+          }
+        }}
+        fullWidth
+        disableBackdropClick
+        disableEscapeKeyDown
+        BackdropProps={{ style: { pointerEvents: 'none' } }}
+      >
         <DialogTitle>Select</DialogTitle>
         <DialogContent>
           {/* Train/Loco No TextField */}
@@ -266,6 +305,9 @@ const CameraView = () => {
                 margin="normal"
                 value={formValues.trainNo} // Updated to trainNo
                 onChange={handleChange}
+                required
+                error={hasSubmitted && !!formErrors.trainNo}
+                helperText={hasSubmitted && formErrors.trainNo}
               />
             </Grid>
             <Grid item xs={12} md={5.5}>
@@ -278,6 +320,9 @@ const CameraView = () => {
                 margin="normal"
                 value={formValues.route}
                 onChange={handleChange}
+                required // Required field
+                error={hasSubmitted && !!formErrors.route}
+                helperText={hasSubmitted && formErrors.route}
               >
                 <MenuItem value="Route 1">Route 1</MenuItem>
                 <MenuItem value="Route 2">Route 2</MenuItem>
@@ -298,6 +343,9 @@ const CameraView = () => {
                 margin="normal"
                 value={formValues.line}
                 onChange={handleChange}
+                required
+                error={hasSubmitted && !!formErrors.line}
+                helperText={hasSubmitted && formErrors.line}
               >
                 <MenuItem value="Line 1">Line 1</MenuItem>
                 <MenuItem value="Line 2">Line 2</MenuItem>
@@ -326,6 +374,9 @@ const CameraView = () => {
                 margin="normal"
                 value={formValues.associatingStaff}
                 onChange={handleChange}
+                required
+                error={hasSubmitted && !!formErrors.associatingStaff}
+                helperText={hasSubmitted && formErrors.associatingStaff}
               />
             </Grid>
             <Grid item xs={12} md={5.5}>
@@ -336,6 +387,9 @@ const CameraView = () => {
                 margin="normal"
                 value={formValues.pantographModel}
                 onChange={handleChange}
+                required
+                error={hasSubmitted && !!formErrors.pantographModel}
+                helperText={hasSubmitted && formErrors.pantographModel}
               />
             </Grid>
           </Grid>
@@ -417,7 +471,7 @@ const CameraView = () => {
         sx={{
           flex: 1,
           padding: 2,
-        
+
           display: "flex",
           flexDirection: "column",
           backgroundColor: isNightMode ? "#333" : "#f5f5f5",
@@ -431,38 +485,42 @@ const CameraView = () => {
           justifyContent="space-between"
           sx={{ background: "black", padding: 2 }}
         >
-          <Grid item sx={8} container>
+          <Grid item sx={8} md={8} container>
             <Typography
               sx={{ fontWeight: "bold", marginRight: 10 }}
               color="teal"
-              style={{ fontSize: '1vw' }}
+              style={{ fontSize: "1vw" }}
             >
               TRAIN/LOCO NO. {formValues.trainNo}
             </Typography>
             <Typography
               sx={{ fontWeight: "bold", marginRight: 10 }}
               color="teal"
-              style={{ fontSize: '1vw' }}
+              style={{ fontSize: "1vw" }}
             >
               ROUTE: {formValues.route} | LINE : {formValues.line}
             </Typography>
             <Typography
               sx={{ fontWeight: "bold", marginRight: 10 }}
               color="teal"
-              style={{ fontSize: '1vw' }}
+              style={{ fontSize: "1vw" }}
             >
               Section:
             </Typography>
-            <Typography sx={{ fontWeight: "bold" }} color="teal" style={{ fontSize: '1vw' }}>
+            <Typography
+              sx={{ fontWeight: "bold" }}
+              color="teal"
+              style={{ fontSize: "1vw" }}
+            >
               TRD Feature:
             </Typography>
           </Grid>
-          <Grid item md={4} xs={12}>
+          <Grid item md={2} xs={12}>
             <Typography
               textAlign="center"
               sx={{ fontWeight: "bold" }}
               color="teal"
-              style={{ fontSize: '1vw' }}
+              style={{ fontSize: "1vw" }}
             >
               ENG. FEATURE
             </Typography>
@@ -481,34 +539,36 @@ const CameraView = () => {
               checked={isNightMode}
               onChange={() => setIsNightMode(!isNightMode)}
             />
-            <Typography  style={{ fontSize: '1vw' }} component="span">
+            <Typography style={{ fontSize: "1vw" }} component="span">
               {isNightMode ? "Night Mode" : "Day Mode"}
             </Typography>
           </Grid>
           <Grid item xs={2}>
             <Switch checked={isGPS} onChange={() => setIsGPS(!isGPS)} />
-            <Typography style={{ fontSize: '1vw' }} component="span">
+            <Typography style={{ fontSize: "1vw" }} component="span">
               GPS
             </Typography>
           </Grid>
           <Grid item xs={2}>
-            <Typography style={{ fontSize: '1vw' }}>Recording: {isRecording ? "ON" : "OFF"}</Typography>
+            <Typography style={{ fontSize: "1vw" }}>
+              Recording: {isRecording ? "ON" : "OFF"}
+            </Typography>
           </Grid>
           <Grid item xs={2}>
-            <Typography style={{ fontSize: '1vw' }}>Time: HH:MM</Typography>
+            <Typography style={{ fontSize: "1vw" }}>Time: HH:MM</Typography>
           </Grid>
         </Grid>
 
         <Divider sx={{ marginY: 2 }} />
 
         <Grid container spacing={2} sx={{ height: "100vh" }}>
-          <Grid item xs={8} >
+          <Grid item xs={8}>
             <Box
               id="videoContainer"
               sx={{
                 position: "relative",
                 backgroundColor: "#000",
-                height: "50vh",
+                height: "60vh",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -554,14 +614,7 @@ const CameraView = () => {
               </Box> */}
             </Box>
 
-            <Typography
-    style={{ fontSize: '2vw' }} 
-              textAlign="center"
-              fontWeight={800}
-              sx={{ color: isNightMode ? "#ccc" : "#000", marginTop: 3 }}
-            >
-              Last: 00/00 | Current: 00/00 | Next: 00/00
-            </Typography>
+          
 
             <Divider sx={{ marginY: 2 }} />
             <Grid
@@ -596,7 +649,14 @@ const CameraView = () => {
                   PAUSE
                 </Button>
               )}
-
+  <Typography
+              style={{ fontSize: "1.5vw" }}
+              textAlign="center"
+              fontWeight={800}
+              sx={{ color: isNightMode ? "#ccc" : "#000", marginTop: 3 }}
+            >
+              Last: 00/00 | Current: 00/00 | Next: 00/00
+            </Typography>
               <Button
                 startIcon={<Pause />}
                 variant="contained"
@@ -620,7 +680,10 @@ const CameraView = () => {
                 border: "2px solid teal",
               }}
             >
-              <Typography style={{ fontSize: '2vw' }} sx={{ fontWeight: "bold" }}>
+              <Typography
+                style={{ fontSize: "2vw" }}
+                sx={{ fontWeight: "bold" }}
+              >
                 Last Details
               </Typography>
 
@@ -636,39 +699,45 @@ const CameraView = () => {
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", marginY: 1 }}>
                 <AccessTime sx={{ marginRight: 1 }} />
-                <Typography style={{ fontSize: '1vw' }} >Time: YYYY-MM-DD HH:mm:ss</Typography>
+                <Typography style={{ fontSize: "1vw" }}>
+                  Time: YYYY-MM-DD HH:mm:ss
+                </Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                 <LocationOn sx={{ marginRight: 1 }} />
-                <Typography  style={{ fontSize: '1vw' }}>Location: 00</Typography>
+                <Typography style={{ fontSize: "1vw" }}>
+                  Location: 00
+                </Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                 <Height sx={{ marginRight: 1 }} />
-                <Typography  style={{ fontSize: '1vw' }}>OHE Height: 00</Typography>
+                <Typography style={{ fontSize: "1vw" }}>
+                  OHE Height: 00
+                </Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                 <Straighten sx={{ marginRight: 1 }} />
-                <Typography  style={{ fontSize: '1vw' }}>CP 1: 00</Typography>
+                <Typography style={{ fontSize: "1vw" }}>CP 1: 00</Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                 <Straighten sx={{ marginRight: 1 }} />
-                <Typography  style={{ fontSize: '1vw' }}>CP 2: 00</Typography>
-              </Box>
-              <Box sx={{ display: "flex", alignItems: "center", marginTop: 1}}>
-                <Straighten sx={{ marginRight: 1 }} />
-                <Typography  style={{ fontSize: '1vw' }}>CP 3: 00</Typography>
+                <Typography style={{ fontSize: "1vw" }}>CP 2: 00</Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                 <Straighten sx={{ marginRight: 1 }} />
-                <Typography  style={{ fontSize: '1vw' }}>CP 4: 00</Typography>
+                <Typography style={{ fontSize: "1vw" }}>CP 3: 00</Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                 <Straighten sx={{ marginRight: 1 }} />
-                <Typography  style={{ fontSize: '1vw' }}>CP 5: 00</Typography>
+                <Typography style={{ fontSize: "1vw" }}>CP 4: 00</Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
-                <FlashOn sx={{ marginRight: 1 }} />
-                <Typography  style={{ fontSize: '1vw' }}>IMP: 00</Typography>
+                <Straighten sx={{ marginRight: 1 }} />
+                <Typography style={{ fontSize: "1vw" }}>CP 5: 00</Typography>
+              </Box>
+              <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
+                <SwapHoriz sx={{ marginRight: 1 }} />
+                <Typography style={{ fontSize: "1vw" }}>IMP: 00</Typography>
               </Box>
             </Box>
           </Grid>
@@ -684,14 +753,14 @@ const CameraView = () => {
               }}
             >
               <Typography
-     style={{ fontSize: '2vw' }} 
+                style={{ fontSize: "2vw" }}
                 textAlign="center"
                 sx={{ fontWeight: "bold" }}
               >
                 Speed
               </Typography>
               <Typography
-     style={{ fontSize: '2vw' }} 
+                style={{ fontSize: "1.5vw" }}
                 sx={{
                   fontWeight: "bold",
                   textAlign: "center",
@@ -710,9 +779,11 @@ const CameraView = () => {
               >
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                   <AccessTime sx={{ marginRight: 1 }} />
-                  <Typography  style={{ fontSize: '1vw' }}>Time Elapsed</Typography>
+                  <Typography style={{ fontSize: "1vw" }}>
+                    Time Elapsed
+                  </Typography>
                 </Box>
-                <Typography  style={{ fontSize: '1vw' }}>00</Typography>
+                <Typography style={{ fontSize: "1vw" }}>00</Typography>
               </Box>
 
               <Box
@@ -724,9 +795,11 @@ const CameraView = () => {
               >
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                   <DirectionsWalk sx={{ marginRight: 1 }} />
-                  <Typography  style={{ fontSize: '1vw' }}>Distance Traveled</Typography>
+                  <Typography style={{ fontSize: "1vw" }}>
+                    Distance Traveled
+                  </Typography>
                 </Box>
-                <Typography  style={{ fontSize: '1vw' }}>00</Typography>
+                <Typography style={{ fontSize: "1vw" }}>00</Typography>
               </Box>
 
               <Box
@@ -738,9 +811,11 @@ const CameraView = () => {
               >
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                   <Satellite sx={{ marginRight: 1 }} />
-                  <Typography  style={{ fontSize: '1vw' }}>Satellites</Typography>
+                  <Typography style={{ fontSize: "1vw" }}>
+                    Satellites
+                  </Typography>
                 </Box>
-                <Typography  style={{ fontSize: '1vw' }}>0</Typography>
+                <Typography style={{ fontSize: "1vw" }}>0</Typography>
               </Box>
 
               <Box
@@ -752,9 +827,9 @@ const CameraView = () => {
               >
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                   <Explore sx={{ marginRight: 1 }} />
-                  <Typography  style={{ fontSize: '1vw' }}>Longitude</Typography>
+                  <Typography style={{ fontSize: "1vw" }}>Longitude</Typography>
                 </Box>
-                <Typography  style={{ fontSize: '1vw' }}>0</Typography>
+                <Typography style={{ fontSize: "1vw" }}>0</Typography>
               </Box>
 
               <Box
@@ -766,9 +841,9 @@ const CameraView = () => {
               >
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                   <Explore sx={{ marginRight: 1 }} />
-                  <Typography  style={{ fontSize: '1vw' }}>Latitude</Typography>
+                  <Typography style={{ fontSize: "1vw" }}>Latitude</Typography>
                 </Box>
-                <Typography  style={{ fontSize: '1vw' }}>0</Typography>
+                <Typography style={{ fontSize: "1vw" }}>0</Typography>
               </Box>
 
               <Box
@@ -780,60 +855,85 @@ const CameraView = () => {
               >
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                   <Height sx={{ marginRight: 1 }} />
-                  <Typography  style={{ fontSize: '1vw' }}>Altitude</Typography>
+                  <Typography style={{ fontSize: "1vw" }}>Altitude</Typography>
                 </Box>
-                <Typography  style={{ fontSize: '1vw' }}>0</Typography>
+                <Typography style={{ fontSize: "1vw" }}>0</Typography>
               </Box>
               <Typography
-             style={{ fontSize: '1vw' }}
+                style={{ fontSize: "1vw" }}
                 sx={{
                   fontWeight: "900",
                   textAlign: "center",
                   margin: "16px 0",
-                  fontSize: 15,
+                  fontSize: 18,
                 }}
               >
                 Last 3 Details
               </Typography>
               <Grid container justifyContent="space-between">
-                <Grid item  xs={6}>
-                  <Typography style={{ fontSize: '1vw' }} textAlign="center" color="#00E5FF">
+                <Grid item xs={6}>
+                  <Typography
+                    style={{ fontSize: "1vw" }}
+                    textAlign="center"
+                    color="#00E5FF"
+                  >
                     {" "}
                     Location
                   </Typography>
                 </Grid>
-                <Grid item  xs={6}>
-                  <Typography  style={{ fontSize: '1vw' }} textAlign="center" color="#00E5FF">
+                <Grid item xs={6}>
+                  <Typography
+                    style={{ fontSize: "1vw" }}
+                    textAlign="center"
+                    color="#00E5FF"
+                  >
                     {" "}
                     PantoHeight
                   </Typography>
                 </Grid>
               </Grid>
-              <Divider sx={{marginY:1}} />
+              <Divider sx={{ marginY: 1 }} />
               <Grid container justifyContent="space-between">
                 <Grid item xs={6}>
-                  <Typography  style={{ fontSize: '1vw' }} textAlign="center"> Loc 1</Typography>
+                  <Typography style={{ fontSize: "1vw" }} textAlign="center">
+                    {" "}
+                    Loc 1
+                  </Typography>
                 </Grid>
-                <Grid item  xs={6}>
-                  <Typography  style={{ fontSize: '1vw' }} textAlign="center">00</Typography>
-                </Grid>
-              </Grid>
-              <Divider  />
-              <Grid container justifyContent="space-between">
-                <Grid item  xs={6}>
-                  <Typography  style={{ fontSize: '1vw' }} textAlign="center"> Loc 2</Typography>
-                </Grid>
-                <Grid item  xs={6}>
-                  <Typography  style={{ fontSize: '1vw' }} textAlign="center"> 00</Typography>
+                <Grid item xs={6}>
+                  <Typography style={{ fontSize: "1vw" }} textAlign="center">
+                    00
+                  </Typography>
                 </Grid>
               </Grid>
-              <Divider  />
+              <Divider sx={{ marginY: 1 }}/>
               <Grid container justifyContent="space-between">
-                <Grid item  xs={6}>
-                  <Typography  style={{ fontSize: '1vw' }} textAlign="center"> Loc 3</Typography>
+                <Grid item xs={6}>
+                  <Typography style={{ fontSize: "1vw" }} textAlign="center">
+                    {" "}
+                    Loc 2
+                  </Typography>
                 </Grid>
-                <Grid item  xs={6}>
-                  <Typography  style={{ fontSize: '1vw' }} textAlign="center"> 00</Typography>
+                <Grid item xs={6}>
+                  <Typography style={{ fontSize: "1vw" }} textAlign="center">
+                    {" "}
+                    00
+                  </Typography>
+                </Grid>
+              </Grid>
+              <Divider sx={{ marginY: 1 }}/>
+              <Grid container justifyContent="space-between">
+                <Grid item xs={6}>
+                  <Typography style={{ fontSize: "1vw" }} textAlign="center">
+                    {" "}
+                    Loc 3
+                  </Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography style={{ fontSize: "1vw" }} textAlign="center">
+                    {" "}
+                    00
+                  </Typography>
                 </Grid>
               </Grid>
               {/* <Table>
