@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Box } from "@mui/material";
+import { Box,Button } from "@mui/material";
 
 const VideoUploadAndStream = () => {
   const [videoFile, setVideoFile] = useState(null);
@@ -73,6 +73,8 @@ const VideoUploadAndStream = () => {
       <input type="file" accept="video/*" onChange={handleVideoUpload} />
       
       {isLoading && <p>Processing video, please wait...</p>}
+      {frames && <Button>Save video</Button>}
+     
       {frames && 
           <img
             src={`data:image/jpeg;base64,${frames}`}

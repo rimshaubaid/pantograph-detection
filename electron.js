@@ -27,7 +27,7 @@ async function createWindow() {
         mainWindow.webContents.closeDevTools();
     });
 
-    mainWindow.loadURL(url.format({
+    mainWindow.loadURL(isDev ? "http://localhost:3000" : url.format({
         pathname: path.join(__dirname, 'index.html'),
         protocol: 'file:',
         slashes: true
