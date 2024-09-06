@@ -227,7 +227,11 @@ const CameraView = () => {
       
       // // Send base64 frame to backend
       try {
-        const response = await axios.post('http://81.208.170.168:5100/process-camera-feed', { image: base64Data });
+
+        const response = await fetch("http://127.0.0.1:5000/process-camera-feed", {
+          method: "POST",
+          body: base64Data,
+        });
         if (!response.body) {
           throw new Error("ReadableStream not supported or no body in response");
         }
