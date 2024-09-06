@@ -7,7 +7,7 @@ import { spawn } from 'child_process';
 // Manually define __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
+let pythonProcess = null;
 
 async function createWindow() {
     let mainWindow = new BrowserWindow({
@@ -68,5 +68,11 @@ app.whenReady().then(createWindow);
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
         app.quit();
+    }
+});
+
+app.on('will-quit', () => {
+    if (pythonProcess) {
+        pythonProcess.kill();
     }
 });
