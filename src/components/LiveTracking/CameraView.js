@@ -64,7 +64,7 @@ const CameraView = () => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const [isStreaming, setIsStreaming] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
+  const [isRecording, setIsRecording] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const [openPauseDialog, setOpenPauseDialog] = useState(false);
   const [openResumeDialog, setOpenResumeDialog] = useState(false);
@@ -179,6 +179,7 @@ const CameraView = () => {
 
   const handlePauseRecording = () => {
     setOpenPauseDialog(true);
+  
   };
 
   const handleResumeRecording = () => {
@@ -219,10 +220,14 @@ const CameraView = () => {
 
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
       const base64Image = canvas.toDataURL('image/jpeg');
-     
+
+
+      // Remove the prefix from base64 string
+      const base64Data = base64Image.replace(/^data:image\/jpeg;base64,/, '');
+      
       // // Send base64 frame to backend
       try {
-        const response = await axios.post('http://81.208.170.168:5100/process-camera-feed', { image: base64Image });
+        const response = await axios.post('http://81.208.170.168:5100/process-camera-feed', { image: base64Data });
         if (!response.body) {
           throw new Error("ReadableStream not supported or no body in response");
         }
@@ -253,9 +258,13 @@ const CameraView = () => {
   };
 
   useEffect(() => {
-    const intervalId = setInterval(captureFrame, 1000); // Capture frame every 1 second
+    let intervalId;
+    if(!isPaused){
+      intervalId = setInterval(captureFrame, 1000); // Capture frame every 1 second
+    }
+  
     return () => clearInterval(intervalId);
-  }, []);
+  }, [isPaused,isRecording]);
   
 
   useEffect(() => {
