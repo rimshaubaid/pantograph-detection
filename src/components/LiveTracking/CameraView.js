@@ -62,8 +62,8 @@ const CameraView = () => {
   const [formErrors, setFormErrors] = useState({});
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const videoRef = useRef(null);
-
-
+  const canvasRef = useRef(null);
+  const [isStreaming, setIsStreaming] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [openPauseDialog, setOpenPauseDialog] = useState(false);
@@ -73,53 +73,55 @@ const CameraView = () => {
  // const [loading,setLoading] = useState()
   const [frames, setFrames] = useState([]);
 
-  useEffect(() => {
-    const fetchFrames = async () => {
-     // setIsLoading(true);
+
+
+  // useEffect(() => {
+  //   const fetchFrames = async () => {
+  //    // setIsLoading(true);
   
      
   
-      try {
-        const response = await fetch("http://81.208.170.168:5100/process-camera-feed", {
-          method: "POST",
-         // body: formData,
-        });
+  //     try {
+  //       const response = await fetch("http://81.208.170.168:5100/process-camera-feed", {
+  //         method: "POST",
+  //        // body: formData,
+  //       });
   
-        if (!response.body) {
-          throw new Error("ReadableStream not supported or no body in response");
-        }
+  //       if (!response.body) {
+  //         throw new Error("ReadableStream not supported or no body in response");
+  //       }
   
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        let buffer = '';
+  //       const reader = response.body.getReader();
+  //       const decoder = new TextDecoder();
+  //       let buffer = '';
   
-        // Process the stream
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
+  //       // Process the stream
+  //       while (true) {
+  //         const { done, value } = await reader.read();
+  //         if (done) break;
   
-          buffer += decoder.decode(value, { stream: true });
-         // console.log('buffer',buffer)
-          // Split buffer by newlines to get frames
-          const frames = buffer.split('\n');
-          buffer = frames.pop(); // Keep any incomplete frame in buffer
+  //         buffer += decoder.decode(value, { stream: true });
+  //        // console.log('buffer',buffer)
+  //         // Split buffer by newlines to get frames
+  //         const frames = buffer.split('\n');
+  //         buffer = frames.pop(); // Keep any incomplete frame in buffer
   
-          frames.forEach(frame => {
-            if (frame) setFrames(frame); // Update state with new frame
-          });
-        }
+  //         frames.forEach(frame => {
+  //           if (frame) setFrames(frame); // Update state with new frame
+  //         });
+  //       }
   
-       // setIsLoading(false);
+  //      // setIsLoading(false);
   
-      } catch (error) {
-        console.error('Error processing video:', error);
-       // setIsLoading(false);
-      }
-    };
+  //     } catch (error) {
+  //       console.error('Error processing video:', error);
+  //      // setIsLoading(false);
+  //     }
+  //   };
    
 
-    fetchFrames();
-  }, []);
+  //   fetchFrames();
+  // }, []);
 
   useEffect(() => {
     const handleBeforeUnload = (event) => {
@@ -206,36 +208,85 @@ const CameraView = () => {
       [name]: value,
     }));
   };
+  const captureFrame = async () => {
+    if (videoRef.current && canvasRef.current) {
+      const canvas = canvasRef.current;
+      const context = canvas.getContext('2d');
+      const video = videoRef.current;
 
- 
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
 
-  // useEffect(() => {
-  //   const startCamera = async () => {
-  //     try {
-  //       const stream = await navigator.mediaDevices.getUserMedia({
-  //         video: true,
-  //       });
-  //       const videoElement = document.getElementById("webcam");
-  //       if (videoElement) {
-  //         videoElement.srcObject = stream;
-  //       }
-  //       setCameraError(null);
-  //     } catch (error) {
-  //       setCameraError("Camera is not connected or accessible.");
-  //     }
-  //   };
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const base64Image = canvas.toDataURL('image/jpeg');
+     
+      // // Send base64 frame to backend
+      try {
+        const response = await axios.post('http://81.208.170.168:5100/process-camera-feed', { image: base64Image });
+        if (!response.body) {
+          throw new Error("ReadableStream not supported or no body in response");
+        }
+  
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+  
+        // Process the stream
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+  
+          buffer += decoder.decode(value, { stream: true });
+         // console.log('buffer',buffer)
+          // Split buffer by newlines to get frames
+          const frames = buffer.split('\n');
+          buffer = frames.pop(); // Keep any incomplete frame in buffer
+  
+          frames.forEach(frame => {
+            if (frame) setFrames(frame); // Update state with new frame
+          });
+        }
+      } catch (error) {
+        console.error('Error sending frame to backend:', error);
+      }
+    }
+  };
 
-  //   startCamera();
+  useEffect(() => {
+    const intervalId = setInterval(captureFrame, 1000); // Capture frame every 1 second
+    return () => clearInterval(intervalId);
+  }, []);
+  
 
-  //   return () => {
-  //     const videoElement = document.getElementById("webcam");
-  //     if (videoElement && videoElement.srcObject) {
-  //       const stream = videoElement.srcObject;
-  //       const tracks = stream.getTracks();
-  //       tracks.forEach((track) => track.stop());
-  //     }
-  //   };
-  // }, []);
+  useEffect(() => {
+    const startVideo = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+
+          // Ensure play() is called only once the video is ready
+          videoRef.current.onloadedmetadata = () => {
+            videoRef.current.play().catch(error => console.error('Error playing video:', error));
+          };
+        }
+      } catch (error) {
+        console.error('Error accessing user media:', error);
+      }
+    };
+
+    startVideo();
+
+    return () => {
+      if (videoRef.current) {
+        const stream = videoRef.current.srcObject;
+        if (stream) {
+          stream.getTracks().forEach(track => track.stop());
+        }
+      }
+    };
+  }, []);
+
   
   const validateForm = () => {
     const errors = {};
@@ -291,7 +342,7 @@ const CameraView = () => {
         fullWidth
         disableBackdropClick
         disableEscapeKeyDown
-        BackdropProps={{ style: { pointerEvents: 'none' } }}
+        BackdropProps={{ style: { pointerEvents: "none" } }}
       >
         <DialogTitle>Select</DialogTitle>
         <DialogContent>
@@ -588,9 +639,12 @@ const CameraView = () => {
                     style={{ width: "100%", height: "100%" }}
                     src={`data:image/jpeg;base64,${frames}`}
                     alt="Camera Feed"
+                    ref={videoRef}
                   />
                 )
               )}
+              <video ref={videoRef} style={{ display: "none" }} />
+              <canvas ref={canvasRef} style={{ display: "none" }} />
               {/* <video
                   id="webcam"
                   ref={videoRef}
@@ -613,8 +667,6 @@ const CameraView = () => {
                 </Typography>
               </Box> */}
             </Box>
-
-          
 
             <Divider sx={{ marginY: 2 }} />
             <Grid
@@ -649,14 +701,14 @@ const CameraView = () => {
                   PAUSE
                 </Button>
               )}
-  <Typography
-              style={{ fontSize: "1.5vw" }}
-              textAlign="center"
-              fontWeight={800}
-              sx={{ color: isNightMode ? "#ccc" : "#000", marginTop: 3 }}
-            >
-              Last: 00/00 | Current: 00/00 | Next: 00/00
-            </Typography>
+              <Typography
+                style={{ fontSize: "1.5vw" }}
+                textAlign="center"
+                fontWeight={800}
+                sx={{ color: isNightMode ? "#ccc" : "#000", marginTop: 3 }}
+              >
+                Last: 00/00 | Current: 00/00 | Next: 00/00
+              </Typography>
               <Button
                 startIcon={<Pause />}
                 variant="contained"
@@ -906,7 +958,7 @@ const CameraView = () => {
                   </Typography>
                 </Grid>
               </Grid>
-              <Divider sx={{ marginY: 1 }}/>
+              <Divider sx={{ marginY: 1 }} />
               <Grid container justifyContent="space-between">
                 <Grid item xs={6}>
                   <Typography style={{ fontSize: "1vw" }} textAlign="center">
@@ -921,7 +973,7 @@ const CameraView = () => {
                   </Typography>
                 </Grid>
               </Grid>
-              <Divider sx={{ marginY: 1 }}/>
+              <Divider sx={{ marginY: 1 }} />
               <Grid container justifyContent="space-between">
                 <Grid item xs={6}>
                   <Typography style={{ fontSize: "1vw" }} textAlign="center">
