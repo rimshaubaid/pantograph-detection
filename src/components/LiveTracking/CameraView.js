@@ -72,8 +72,8 @@ const CameraView = () => {
   const [isFullScreen, setIsFullScreen] = useState(false);
  // const [loading,setLoading] = useState()
   const [frames, setFrames] = useState([]);
-
-
+  const [contactPoints,setContactPoints] = useState(null);
+  const [height,setHeight] = useState(null);
 
   // useEffect(() => {
   //   const fetchFrames = async () => {
@@ -212,51 +212,70 @@ const CameraView = () => {
   const captureFrame = async () => {
     if (videoRef.current && canvasRef.current) {
       const canvas = canvasRef.current;
-      const context = canvas.getContext('2d');
+      const context = canvas.getContext("2d");
       const video = videoRef.current;
 
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
 
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const base64Image = canvas.toDataURL('image/jpeg');
-
+      const base64Image = canvas.toDataURL("image/jpeg");
 
       // Remove the prefix from base64 string
-      const base64Data = base64Image.replace(/^data:image\/jpeg;base64,/, '');
-      
+      const base64Data = base64Image.replace(/^data:image\/jpeg;base64,/, "");
+
       // // Send base64 frame to backend
       try {
-
-        const response = await fetch("http://127.0.0.1:5000/process-camera-feed", {
-          method: "POST",
-          body: base64Data,
-        });
+        const response = await fetch(
+          "http://127.0.0.1:5000/process-camera-feed",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json", // Set content type as JSON
+            },
+            body: JSON.stringify({ frame: base64Data }), // Serialize the body
+          }
+        );
+       
         if (!response.body) {
-          throw new Error("ReadableStream not supported or no body in response");
+          throw new Error(
+            "ReadableStream not supported or no body in response"
+          );
         }
-  
+
         const reader = response.body.getReader();
+      
         const decoder = new TextDecoder();
-        let buffer = '';
-  
+        let buffer = "";
+   
         // Process the stream
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-  
+ 
           buffer += decoder.decode(value, { stream: true });
-         // console.log('buffer',buffer)
+          // console.log('buffer',buffer)
           // Split buffer by newlines to get frames
-          const frames = buffer.split('\n');
+          const frames = buffer.split("\n");
           buffer = frames.pop(); // Keep any incomplete frame in buffer
-  
-          frames.forEach(frame => {
-            if (frame) setFrames(frame); // Update state with new frame
+
+          frames.forEach((frame) => {
+            if (frame) {
+              try {
+                const parsedFrame = JSON.parse(frame); // Parse the frame as JSON
+                if (parsedFrame.processed_frame) {
+                  setFrames(parsedFrame.processed_frame); // Update state with new frame
+                  setContactPoints(parsedFrame?.contact_points);
+                  setHeight(parsedFrame?.pantograph_height);
+                }
+              } catch (error) {
+                console.error("Error parsing frame:", error);
+              }
+            }
           });
         }
       } catch (error) {
-        console.error('Error sending frame to backend:', error);
+        console.error("Error sending frame to backend:", error);
       }
     }
   };
@@ -672,13 +691,16 @@ const CameraView = () => {
                   {isFullScreen ? <FullscreenExit /> : <Fullscreen />}
                 </IconButton>
               </Box>
-              {/* <Box sx={{ position: "absolute", top: 10, left: 10 }}>
-              
-                <Typography variant="h6" sx={{ color: "white" }}>
-                  Time:{" "}
-                  <span style={{ color: "teal", fontWeight: 800 }}>00</span>
+               <Box sx={{ position: "absolute", top: 10, left: 10 }}>
+               <Typography variant="h6" sx={{ color: "white" }}>
+                  Contact Points:{" "}
+                  <span style={{ color: "teal", fontWeight: 800 }}>{contactPoints}</span>
                 </Typography>
-              </Box> */}
+                <Typography variant="h6" sx={{ color: "white" }}>
+                  PantoHeight:{" "}
+                  <span style={{ color: "teal", fontWeight: 800 }}>{height}</span>
+                </Typography>
+              </Box> 
             </Box>
 
             <Divider sx={{ marginY: 2 }} />
