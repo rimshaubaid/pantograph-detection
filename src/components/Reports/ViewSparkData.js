@@ -202,13 +202,13 @@ const SparkDataView = () => {
                 >
                   Update Records
                 </Button> */}
-                {/* <Button
+                <Button
                   variant="contained"
                   color="secondary"
                   onClick={handleDialogOpen}
                 >
                   Download Report
-                </Button> */}
+                </Button>
               </Box>
             </Box>
           </Paper>

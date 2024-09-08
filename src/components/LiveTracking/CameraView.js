@@ -280,7 +280,7 @@ const CameraView = () => {
       }
     }
   };
-  
+  //console.log('f',fram)
   useEffect(() => {
     let intervalId;
     if(!isPaused){
@@ -749,6 +749,7 @@ const CameraView = () => {
                 startIcon={<Pause />}
                 variant="contained"
                 sx={{ background: "teal" }}
+                
               >
                 SAVE AND EXIT
               </Button>
