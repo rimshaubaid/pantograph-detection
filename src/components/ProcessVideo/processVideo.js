@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { FFmpeg } from "@ffmpeg/ffmpeg";
-import { fetchFile, toBlobURL } from "@ffmpeg/util";
-import { Box, Button } from "@mui/material";
+import React, { useState, useEffect, useRef } from "react";
+import { FFmpeg } from '@ffmpeg/ffmpeg';
+import { fetchFile } from '@ffmpeg/util';
+import { Box, Button, Typography } from "@mui/material";
 
 const VideoUploadAndStream = () => {
   const [videoFile, setVideoFile] = useState(null);
@@ -11,8 +11,21 @@ const VideoUploadAndStream = () => {
   const [videoUrl, setVideoUrl] = useState(null);
   const [isPaused, setIsPaused] = useState(false);
   const [currentFrameIndex, setCurrentFrameIndex] = useState(0);
+  const [ffmpegLoaded, setFfmpegLoaded] = useState(false);
+  const ffmpeg = useRef(new FFmpeg()).current;
 
-  const ffmpeg = new FFmpeg({ log: true });
+  useEffect(() => {
+    const loadFFmpeg = async () => {
+      try {
+        await ffmpeg.load();
+        setFfmpegLoaded(true);
+      } catch (error) {
+        console.error("Failed to load FFmpeg", error);
+      }
+    };
+
+    loadFFmpeg();
+  }, [ffmpeg]);
 
   const handleVideoUpload = (event) => {
     if (event.target.files && event.target.files.length > 0) {
@@ -24,7 +37,7 @@ const VideoUploadAndStream = () => {
     setIsLoading(true);
     const formData = new FormData();
     formData.append("video", videoFile);
-
+    let framesArray = []; // Array to accumulate frames
     try {
       const response = await fetch("http://127.0.0.1:5000/process-video", {
         method: "POST",
@@ -52,7 +65,6 @@ const VideoUploadAndStream = () => {
           if (frame) setFrames((prev) => [...prev, frame]); // Accumulate frames
         });
       }
-
       setIsLoading(false);
     } catch (error) {
       console.error("Error processing video:", error);
@@ -61,31 +73,32 @@ const VideoUploadAndStream = () => {
   };
 
   const saveVideo = async () => {
-    await ffmpeg.load();
+    if (!ffmpegLoaded) {
+      await ffmpeg.load();
+    }
 
     setIsVideoProcessing(true);
 
     // Save each frame as an image file in FFmpeg's virtual file system
     for (let i = 0; i < frames.length; i++) {
       const frame = frames[i];
-      ffmpeg.writeFile(`frame${i}.jpg`, await fetchFile(`data:image/jpeg;base64,${frame}`));
+      await ffmpeg.writeFile(`frame${i}.jpg`, await fetchFile(`data:image/jpeg;base64,${frame}`));
     }
 
     // Create a video from the frames using FFmpeg
-    await ffmpeg.run(
-      "-framerate", "24", // You can adjust the frame rate
-      "-i", "frame%d.jpg", // Input pattern for frames
-      "-c:v", "libx264",
-      "-pix_fmt", "yuv420p",
-      "output.mp4"
+    await ffmpeg.exec(
+      ['-framerate', '24', '-i', 'frame%d.jpg', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', 'output.mp4']
     );
 
-    const data = ffmpeg.readFile("output.mp4");
+    const data = await ffmpeg.readFile('output.mp4');
 
-    // Use the toBlobURL utility to generate a blob URL for downloading the video
-    const videoBlobUrl = toBlobURL(new Blob([data.buffer], { type: "video/mp4" }));
+    // Generate a blob URL for the video file
+    const videoBlobUrl = URL.createObjectURL(
+      new Blob([data.buffer], { type: 'video/mp4' })
+    );
     setVideoUrl(videoBlobUrl);
 
+    // Reset processing state
     setIsVideoProcessing(false);
   };
 
@@ -113,18 +126,27 @@ const VideoUploadAndStream = () => {
 
   return (
     <Box sx={{ paddingTop: 7, paddingX: 5 }}>
-      <h1>Process Video</h1>
+      <Typography>Process Video</Typography>
+
       <input type="file" accept="video/*" onChange={handleVideoUpload} />
 
-      {isLoading && frames?.length < 0 && <p>Processing video, please wait...</p>}
+      {isVideoProcessing && frames?.length < 0 && (
+        <p>Processing video, please wait...</p>
+      )}
       {frames.length > 0 && (
         <Box marginY={1}>
-          {/* <Button onClick={saveVideo}>Save Video</Button> */}
-          <Button variant="outlined" onClick={togglePause}>{isPaused ? "Resume" : "Pause"}</Button>
+          <Button
+            variant="outlined"
+            onClick={saveVideo}
+            disabled={isVideoProcessing}
+          >
+            Save Video
+          </Button>
+          <Button variant="outlined" onClick={togglePause}>
+            {isPaused ? "Resume" : "Pause"}
+          </Button>
         </Box>
       )}
-
-      {/* {isVideoProcessing && <p>Saving video, please wait...</p>} */}
 
       {videoUrl && (
         <a href={videoUrl} download="processed_video.mp4">
