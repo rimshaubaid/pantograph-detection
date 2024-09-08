@@ -125,8 +125,8 @@ const VideoUploadAndStream = () => {
   }, [isPaused, frames]);
 
   return (
-    <Box sx={{ paddingTop: 7, paddingX: 5 }}>
-      <Typography>Process Video</Typography>
+    <Box sx={{ paddingTop: 10, paddingX: 5 }}>
+      <Typography variant="h1">Process Video</Typography>
 
       <input type="file" accept="video/*" onChange={handleVideoUpload} />
 

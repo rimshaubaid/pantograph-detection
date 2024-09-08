@@ -223,7 +223,7 @@ const CameraView = () => {
 
       // Remove the prefix from base64 string
       const base64Data = base64Image.replace(/^data:image\/jpeg;base64,/, "");
-
+      let framesArray = [];
       // // Send base64 frame to backend
       try {
         const response = await fetch(
@@ -264,6 +264,7 @@ const CameraView = () => {
               try {
                 const parsedFrame = JSON.parse(frame); // Parse the frame as JSON
                 if (parsedFrame.processed_frame) {
+                  framesArray.push(parsedFrame.processed_frame);
                   setFrames(parsedFrame.processed_frame); // Update state with new frame
                   setContactPoints(parsedFrame?.contact_points);
                   setHeight(parsedFrame?.pantograph_height);
@@ -279,7 +280,7 @@ const CameraView = () => {
       }
     }
   };
-
+  
   useEffect(() => {
     let intervalId;
     if(!isPaused){
