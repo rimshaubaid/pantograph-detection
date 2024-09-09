@@ -21,6 +21,8 @@ import {
   TableCell,
   TableBody,
 } from "@mui/material";
+import { FFmpeg } from '@ffmpeg/ffmpeg';
+import { fetchFile } from '@ffmpeg/util';
 import {
   Fullscreen,
   FullscreenExit,
@@ -40,12 +42,17 @@ import {
 import { useNavigate } from "react-router-dom";
 
 import axios from "axios";
+let framesArray = [];
 const CameraView = () => {
   const navigate = useNavigate();
   const [cameraError, setCameraError] = useState(null);
   const [isNightMode, setIsNightMode] = useState(true);
   const [isGPS, setIsGPS] = useState(true);
+  const [isVideoProcessing, setIsVideoProcessing] = useState(false);
+  const [videoUrl, setVideoUrl] = useState(null);
   const [openModal, setOpenModal] = useState(true);
+  const [ffmpegLoaded, setFfmpegLoaded] = useState(false);
+  const ffmpeg = useRef(new FFmpeg()).current;
   const [formValues, setFormValues] = useState({
     trainNo: "", // Added trainNo for the Train/Loco No text field
     route: "",
@@ -74,7 +81,18 @@ const CameraView = () => {
   const [frames, setFrames] = useState([]);
   const [contactPoints,setContactPoints] = useState(null);
   const [height,setHeight] = useState(null);
+  useEffect(() => {
+    const loadFFmpeg = async () => {
+      try {
+        await ffmpeg.load();
+        setFfmpegLoaded(true);
+      } catch (error) {
+        console.error("Failed to load FFmpeg", error);
+      }
+    };
 
+    loadFFmpeg();
+  }, [ffmpeg]);
   // useEffect(() => {
   //   const fetchFrames = async () => {
   //    // setIsLoading(true);
@@ -122,6 +140,37 @@ const CameraView = () => {
 
   //   fetchFrames();
   // }, []);
+  const saveVideo = async () => {
+    if (!ffmpegLoaded) {
+      await ffmpeg.load();
+    }
+
+    setIsVideoProcessing(true);
+ 
+    // Save each frame as an image file in FFmpeg's virtual file system
+    for (let i = 0; i < framesArray.length; i++) {
+      const frame = framesArray[i];
+      
+      await ffmpeg.writeFile(`frame${i}.jpg`, await fetchFile(`data:image/jpeg;base64,${frame}`));
+    }
+
+    // Create a video from the frames using FFmpeg
+    await ffmpeg.exec(
+      ['-framerate', '24', '-i', 'frame%d.jpg', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', 'output.mp4']
+    );
+
+    const data = await ffmpeg.readFile('output.mp4');
+
+    // Generate a blob URL for the video file
+    const videoBlobUrl = URL.createObjectURL(
+      new Blob([data.buffer], { type: 'video/mp4' })
+    );
+    setVideoUrl(videoBlobUrl);
+
+    // Reset processing state
+    setIsVideoProcessing(false);
+    navigate("/");
+  };
 
   useEffect(() => {
     const handleBeforeUnload = (event) => {
@@ -223,11 +272,11 @@ const CameraView = () => {
 
       // Remove the prefix from base64 string
       const base64Data = base64Image.replace(/^data:image\/jpeg;base64,/, "");
-      let framesArray = [];
+  
       // // Send base64 frame to backend
       try {
         const response = await fetch(
-          "http://127.0.0.1:5000/process-camera-feed",
+          "http://81.208.170.168:5100/process-camera-feed",
           {
             method: "POST",
             headers: {
@@ -745,14 +794,21 @@ const CameraView = () => {
               >
                 Last: 00/00 | Current: 00/00 | Next: 00/00
               </Typography>
-              <Button
+              {!videoUrl && <Button
                 startIcon={<Pause />}
                 variant="contained"
                 sx={{ background: "teal" }}
-                
+                onClick={saveVideo}
               >
                 SAVE AND EXIT
-              </Button>
+              </Button>}
+              {videoUrl && (
+        <a href={videoUrl} download="processed_video.mp4">
+          <Button variant="contained" color="primary">
+            Download Video
+          </Button>
+        </a>
+      )}
               {/* <Button startIcon={<SpeedIcon />} sx={{ background: 'blue', color: 'white' }}>
               Speed: 000.00 KMPH
             </Button> */}
@@ -1077,7 +1133,8 @@ const CameraView = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
+   
+     
       <Dialog
         open={openNavigateDialog}
         onClose={() => setOpenNavigateDialog(false)}

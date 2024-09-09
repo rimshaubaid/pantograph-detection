@@ -39,8 +39,81 @@ const SparkDataView = () => {
   const [page, setPage] = useState(0); // For pagination
   const [rowsPerPage, setRowsPerPage] = useState(10); // Rows per page
   const handleDownload = () => {
+    
+      if (data.length === 0) {
+        console.log("No data to download.");
+        return;
+      }
+  
+      // Convert data to CSV format
+      const headers = [
+        "Id",
+        "Route",
+        "Section",
+        "CP1",
+        "CP2",
+        "CP3",
+        "CP4",
+        "CP5",
+        "Feature ENG",
+        "Feature TRD",
+        "Frame Number",
+        "Height",
+        "Imp",
+        "Inclination",
+        "PantoHeight",
+        "KM",
+        "Lat",
+        "Long",
+        "Meter",
+        "Uplift Force",
+      ];
+  
+      const csvRows = [headers.join(",")];
+  
+      // Loop through data and convert each object to a CSV row
+      data.forEach((item) => {
+        const row = [
+          item.id,
+          item.route,
+          item.section,
+          item.cp1 || "-",
+          item.cp2 || "-",
+          item.cp3 || "-",
+          item.cp4 || "-",
+          item.cp5 || "-",
+          item.feature_eng,
+          item.feature_trd,
+          item.frame_number,
+          item.height,
+          item.imp,
+          item.inclination,
+          item.pantograph_height,
+          item.km,
+          item.lat,
+          item.long,
+          item.meter,
+          item.uplift_force,
+        ].join(",");
+  
+        csvRows.push(row);
+      });
+  
+      const csvContent = csvRows.join("\n");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+  
+      link.href = url;
+      link.setAttribute("download", "report_data.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+  
+      handleDialogClose(); // Close the dialog after download
+    
     // Handle the download logic based on format and fileType
-    console.log(`Downloading ${format} as ${fileType}`);
+   // console.log(`Downloading ${format} as ${fileType}`);
     handleDialogClose();
   };
   // Pagination and rows per page change handler
@@ -60,7 +133,7 @@ const SparkDataView = () => {
   const getData = async () => {
     try {
       const response = await axios.get(
-        "http://127.0.0.1:5000/fetch-report-data"
+        "http://81.208.170.168:5100/fetch-report-data"
       );
 
       setData(response?.data?.data); // Set the fetched data into state
@@ -205,7 +278,7 @@ const SparkDataView = () => {
                 <Button
                   variant="contained"
                   color="secondary"
-                  onClick={handleDialogOpen}
+                  onClick={handleDownload}
                 >
                   Download Report
                 </Button>

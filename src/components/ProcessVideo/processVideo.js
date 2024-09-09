@@ -39,7 +39,7 @@ const VideoUploadAndStream = () => {
     formData.append("video", videoFile);
     let framesArray = []; // Array to accumulate frames
     try {
-      const response = await fetch("http://127.0.0.1:5000/process-video", {
+      const response = await fetch("http://81.208.170.168:5100/process-video", {
         method: "POST",
         body: formData,
       });
