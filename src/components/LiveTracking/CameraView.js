@@ -276,7 +276,7 @@ const CameraView = () => {
       // // Send base64 frame to backend
       try {
         const response = await fetch(
-          "http://81.208.170.168:5100/process-camera-feed",
+          "http://127.0.0.1:5000/process-camera-feed",
           {
             method: "POST",
             headers: {

@@ -133,7 +133,7 @@ const SparkDataView = () => {
   const getData = async () => {
     try {
       const response = await axios.get(
-        "http://81.208.170.168:5100/fetch-report-data"
+        "http://127.0.0.1:5000/fetch-report-data"
       );
 
       setData(response?.data?.data); // Set the fetched data into state
