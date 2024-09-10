@@ -1,30 +1,72 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Container,
   Grid,
   Button,
-  Select,
-  MenuItem,
   Typography,
-  TableContainer,
+  Paper,
   Table,
-  TableHead,
+  TableContainer,
   TableRow,
   TableCell,
   TableBody,
-  Paper,
-  TextField,
-  InputLabel,
-  FormControl,
+  TableHead
 } from '@mui/material';
+import axios from 'axios';
 
 const UploadRouteData = () => {
   const [fileName, setFileName] = useState('');
-
+  const [file, setFile] = useState(null);
+  const [data,setData] = useState([]);
   const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setFileName(file.name);
+    const selectedFile = event.target.files[0];
+    if (selectedFile) {
+      setFileName(selectedFile.name);
+      setFile(selectedFile); // Store the file in state
+    }
+  };
+ 
+  useEffect(() => {
+    getRouteData();
+  }, []);
+
+  const getRouteData = async () => {
+    try {
+      const response = await axios.get(
+        "http://81.208.170.168:5100/fetch-route-data"
+      );
+      setData(response?.data?.data);
+    } catch (err) {
+
+    }
+  };
+
+  const handleUploadFile = async () => {
+    if (!file) {
+      alert("Please select an XLSX file.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file); // Append the selected file to FormData
+
+    try {
+      const response = await axios.post(
+        "http://81.208.170.168:5100/upload-route-data",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+
+      if (response.data.error) {
+        alert(`Error: ${response.data.error}`);
+      } else {
+        alert("File uploaded successfully!");
+      }
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      alert("Error uploading file. Please try again.");
     }
   };
 
@@ -45,7 +87,7 @@ const UploadRouteData = () => {
               <input
                 type="file"
                 hidden
-                accept=".xlsx, .xls, .pdf"
+                accept=".xlsx"
                 onChange={handleFileChange}
               />
             </Button>
@@ -54,30 +96,16 @@ const UploadRouteData = () => {
             </Typography>
           </Grid>
           <Grid item xs={12} md={4}>
-            <FormControl fullWidth>
-              <InputLabel sx={{ color: '#fff' }}>Select Route</InputLabel>
-              <Select
-                defaultValue=""
-                label="Select Route"
-                sx={{ color: '#fff' }}
-              >
-                <MenuItem value="">
-                  <em>-- Select Route --</em>
-                </MenuItem>
-                {/* Add route options here */}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} md={4}>
             <Button
               variant="contained"
               sx={{ backgroundColor: '#008080', width: '100%' }}
+              onClick={handleUploadFile}
             >
               Upload Data File
             </Button>
           </Grid>
         </Grid>
-        <TableContainer component={Paper} sx={{ marginTop: 2 }}>
+        <TableContainer component={Paper} sx={{ marginTop: 2 , height:"60vh" , overflow:"auto" }}>
           <Table aria-label="simple table">
             <TableHead>
               <TableRow>
@@ -93,12 +121,27 @@ const UploadRouteData = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {/* Add table rows here */}
-              <TableRow>
-                <TableCell colSpan={9} align="center">
-                  No data available in table
-                </TableCell>
-              </TableRow>
+              {data.length > 0 ? (
+                data.map((row, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>{row.Route}</TableCell>
+                    <TableCell>{row.Section}</TableCell>
+                    <TableCell>{row.Location}</TableCell>
+                    <TableCell>{row.Longtitude}</TableCell>
+                    <TableCell>{row.Latitude}</TableCell>
+                    <TableCell>{row.Height}</TableCell>
+                    <TableCell>{row.FeatureENG}</TableCell>
+                    <TableCell>{row.FeatureTRD}</TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={9} align="center">
+                    No data available in table
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </TableContainer>

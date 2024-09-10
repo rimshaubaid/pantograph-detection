@@ -276,13 +276,13 @@ const CameraView = () => {
       // // Send base64 frame to backend
       try {
         const response = await fetch(
-          "http://127.0.0.1:5000/process-camera-feed",
+          "http://81.208.170.168:5100/process-camera-feed",
           {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json", // Set content type as JSON
-            },
-            body: JSON.stringify({ frame: base64Data }), // Serialize the body
+            // headers: {
+            //   "Content-Type": "application/json", // Set content type as JSON
+            // },
+            // body: JSON.stringify({ frame: base64Data }), // Serialize the body
           }
         );
        
@@ -340,34 +340,34 @@ const CameraView = () => {
   }, [isPaused,isRecording]);
   
 
-  useEffect(() => {
-    const startVideo = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
+  // useEffect(() => {
+  //   const startVideo = async () => {
+  //     try {
+  //       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+  //       if (videoRef.current) {
+  //         videoRef.current.srcObject = stream;
 
-          // Ensure play() is called only once the video is ready
-          videoRef.current.onloadedmetadata = () => {
-            videoRef.current.play().catch(error => console.error('Error playing video:', error));
-          };
-        }
-      } catch (error) {
-        console.error('Error accessing user media:', error);
-      }
-    };
+  //         // Ensure play() is called only once the video is ready
+  //         videoRef.current.onloadedmetadata = () => {
+  //           videoRef.current.play().catch(error => console.error('Error playing video:', error));
+  //         };
+  //       }
+  //     } catch (error) {
+  //       console.error('Error accessing user media:', error);
+  //     }
+  //   };
 
-    startVideo();
+  //   startVideo();
 
-    return () => {
-      if (videoRef.current) {
-        const stream = videoRef.current.srcObject;
-        if (stream) {
-          stream.getTracks().forEach(track => track.stop());
-        }
-      }
-    };
-  }, []);
+  //   return () => {
+  //     if (videoRef.current) {
+  //       const stream = videoRef.current.srcObject;
+  //       if (stream) {
+  //         stream.getTracks().forEach(track => track.stop());
+  //       }
+  //     }
+  //   };
+  // }, []);
 
   
   const validateForm = () => {
@@ -469,7 +469,7 @@ const CameraView = () => {
             <Grid item xs={12} md={5.5}>
               {/* Line Dropdown */}
               <TextField
-                select
+              
                 label="Line"
                 name="line"
                 fullWidth
@@ -479,12 +479,8 @@ const CameraView = () => {
                 required
                 error={hasSubmitted && !!formErrors.line}
                 helperText={hasSubmitted && formErrors.line}
-              >
-                <MenuItem value="Line 1">Line 1</MenuItem>
-                <MenuItem value="Line 2">Line 2</MenuItem>
-                <MenuItem value="Line 3">Line 3</MenuItem>
-                {/* Add more lines as needed */}
-              </TextField>
+              />
+               
             </Grid>
             <Grid item xs={12} md={5.5}>
               <TextField
