@@ -33,7 +33,7 @@ const UploadRouteData = () => {
   const getRouteData = async () => {
     try {
       const response = await axios.get(
-        "http://81.208.170.168:5100/fetch-route-data"
+        "http://127.0.0.1:5000/fetch-route-data"
       );
       setData(response?.data?.data);
     } catch (err) {
@@ -52,7 +52,7 @@ const UploadRouteData = () => {
 
     try {
       const response = await axios.post(
-        "http://81.208.170.168:5100/upload-route-data",
+        "http://127.0.0.1:5000/upload-route-data",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
