@@ -154,7 +154,7 @@ const SparkDataView = () => {
       <Grid container spacing={2}>
         <Grid item  xs={8}>
           <Paper sx={{ padding: 3, bgcolor: "#2c2c2c" }}>
-            {/* <Grid container spacing={2}>
+            <Grid container spacing={2}>
               <Grid item xs={6} md={3}>
                 <FormControl
                   fullWidth
@@ -175,11 +175,11 @@ const SparkDataView = () => {
                   sx={{ bgcolor: "#333", borderRadius: 1 }}
                 />
               </Grid>
-            </Grid> */}
+            </Grid>
 
             <TableContainer
               component={Paper}
-              sx={{ marginTop: 2, bgcolor: "#333",overflow:"auto",height:"50vh" }}
+              sx={{ marginTop: 2, bgcolor: "#333",overflow:"auto",height:"30vh" }}
             >
               <Table>
                 <TableHead>
