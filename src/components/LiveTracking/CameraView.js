@@ -100,9 +100,7 @@ const CameraView = () => {
      
   
       try {
-        const response = await fetch("http://127.0.0.1:5000/process-camera-feed", {
-          method: "GET",
-        });
+        const response = await fetch("http://127.0.0.1:5000/process-camera-feed");
   
         if (!response.body) {
           throw new Error("ReadableStream not supported or no body in response");

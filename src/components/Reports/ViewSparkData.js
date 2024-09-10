@@ -175,6 +175,9 @@ const SparkDataView = () => {
                   sx={{ bgcolor: "#333", borderRadius: 1 }}
                 />
               </Grid>
+              <Grid item xs={6} md={3}>
+               <Button variant="outlined">Generate</Button>
+              </Grid>
             </Grid>
 
             <TableContainer
@@ -187,11 +190,11 @@ const SparkDataView = () => {
                     <TableCell>Id</TableCell>
                     <TableCell>Route</TableCell>
                     <TableCell>Section</TableCell>
-                    <TableCell>CP1</TableCell>
-                    <TableCell>CP2</TableCell>
-                    <TableCell>CP3</TableCell>
-                    <TableCell>CP4</TableCell>
-                    <TableCell>CP5</TableCell>
+                    <TableCell>Stagger1</TableCell>
+                    <TableCell>Stagger2</TableCell>
+                    <TableCell>Stagger3</TableCell>
+                    <TableCell>Stagger4</TableCell>
+                    <TableCell>Stagger5</TableCell>
                     <TableCell>Feature ENG</TableCell>
                     <TableCell>Feature TRD</TableCell>
                     <TableCell>Frame Number</TableCell>
@@ -199,11 +202,8 @@ const SparkDataView = () => {
                     <TableCell>Imp</TableCell>
                     <TableCell>Inclination</TableCell>
                     <TableCell>PantoHeight</TableCell>
-                    <TableCell>KM</TableCell>
-                    <TableCell>Lat</TableCell>
-                    <TableCell>Long</TableCell>
-                    <TableCell>Meter</TableCell>
-                    <TableCell>Uplift Force</TableCell>
+                   
+
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -227,11 +227,8 @@ const SparkDataView = () => {
                         <TableCell>{item.imp}</TableCell>
                         <TableCell>{item.inclination}</TableCell>
                         <TableCell>{item.pantograph_height}</TableCell>
-                        <TableCell>{item.km}</TableCell>
-                        <TableCell>{item.lat}</TableCell>
-                        <TableCell>{item.long}</TableCell>
-                        <TableCell>{item.meter}</TableCell>
-                        <TableCell>{item.uplift_force}</TableCell>
+                        
+                   
                       </TableRow>
                     ))
                   ) : (
@@ -263,13 +260,13 @@ const SparkDataView = () => {
                sx={{ bgcolor: "#2c2c2c", color: "#fff" }}
               />
               <Box>
-                {/* <Button
+                <Button
                   variant="contained"
                   color="primary"
                   sx={{ marginRight: 2 }}
                 >
                   Update Records
-                </Button> */}
+                </Button>
                 <Button
                   variant="contained"
                   color="secondary"
