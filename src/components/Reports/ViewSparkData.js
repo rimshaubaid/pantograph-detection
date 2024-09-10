@@ -50,11 +50,11 @@ const SparkDataView = () => {
         "Id",
         "Route",
         "Section",
-        "CP1",
-        "CP2",
-        "CP3",
-        "CP4",
-        "CP5",
+        "Stagger 1",
+        "Stagger 2",
+        "Stagger 3",
+        "Stagger 4",
+        "Stagger 5",
         "Feature ENG",
         "Feature TRD",
         "Frame Number",
@@ -62,10 +62,7 @@ const SparkDataView = () => {
         "Imp",
         "Inclination",
         "PantoHeight",
-        "KM",
-        "Lat",
-        "Long",
-        "Meter",
+        
         "Uplift Force",
       ];
   
@@ -89,10 +86,8 @@ const SparkDataView = () => {
           item.imp,
           item.inclination,
           item.pantograph_height,
-          item.km,
-          item.lat,
-          item.long,
-          item.meter,
+          
+    
           item.uplift_force,
         ].join(",");
   
@@ -288,66 +283,9 @@ const SparkDataView = () => {
         
          
         </Grid>
-        <Grid item  xs={4}>
-  <Grid container spacing={2} sx={{ marginTop: 3 }}>
-    {/* First Row */}
-    <Grid item xs={6}>
-      <Button onClick={handleDialogOpen} variant="contained" fullWidth>
-        OHE Height
-      </Button>
-    </Grid>
-    <Grid item xs={6}>
-      <Button onClick={handleDialogOpen} variant="contained" fullWidth>
-        Stagger
-      </Button>
-    </Grid>
+      
 
-    {/* Second Row */}
-    <Grid item xs={6}>
-      <Button onClick={handleDialogOpen} variant="contained" fullWidth>
-        Gradient
-      </Button>
-    </Grid>
-    <Grid item xs={6}>
-      <Button onClick={handleDialogOpen} variant="contained" fullWidth>
-        IOL
-      </Button>
-    </Grid>
-
-    {/* Third Row */}
-    <Grid item xs={6}>
-      <Button onClick={handleDialogOpen} variant="contained" fullWidth>
-        UIOL
-      </Button>
-    </Grid>
-    <Grid item xs={6}>
-      <Button onClick={handleDialogOpen} variant="contained" fullWidth>
-        X/0 & T/0
-      </Button>
-    </Grid>
-
-    {/* Fourth Row */}
-    <Grid item xs={6}>
-      <Button onClick={handleDialogOpen} variant="contained" fullWidth>
-        All data
-      </Button>
-    </Grid>
-    <Grid item xs={6}>
-      <Button onClick={handleDialogOpen} variant="contained" fullWidth>
-        Wire condition
-      </Button>
-    </Grid>
-
-    {/* Fifth Row */}
-    <Grid item xs={6}>
-      <Button onClick={handleDialogOpen} variant="contained" fullWidth>
-        Insulator
-      </Button>
-    </Grid>
-  </Grid>
-</Grid>
-
-        {/* <Grid item xs={12} md={4}>
+        <Grid item xs={12} md={4}>
           <Card sx={{ bgcolor: "#333", color: "#00E5FF" }}>
             <CardContent>
               <Box
@@ -373,8 +311,65 @@ const SparkDataView = () => {
               </Typography>
             </CardContent>
           </Card>
-        </Grid> */}
+        </Grid>
       </Grid>
+ 
+  <Grid container spacing={2} sx={{ marginTop: 3 }}>
+    {/* First Row */}
+    <Grid item xs={1}>
+      <Button onClick={handleDialogOpen} variant="contained" fullWidth>
+        OHE Height
+      </Button>
+    </Grid>
+    <Grid item xs={1}>
+      <Button onClick={handleDialogOpen} variant="contained" fullWidth>
+        Stagger
+      </Button>
+    </Grid>
+
+    {/* Second Row */}
+    <Grid item xs={1}>
+      <Button onClick={handleDialogOpen} variant="contained" fullWidth>
+        Gradient
+      </Button>
+    </Grid>
+    <Grid item xs={1}>
+      <Button onClick={handleDialogOpen} variant="contained" fullWidth>
+        IOL
+      </Button>
+    </Grid>
+
+    {/* Third Row */}
+    <Grid item xs={1}>
+      <Button onClick={handleDialogOpen} variant="contained" fullWidth>
+        UIOL
+      </Button>
+    </Grid>
+    <Grid item xs={1}>
+      <Button onClick={handleDialogOpen} variant="contained" fullWidth>
+        X/0 & T/0
+      </Button>
+    </Grid>
+
+    {/* Fourth Row */}
+    <Grid item xs={1}>
+      <Button onClick={handleDialogOpen} variant="contained" fullWidth>
+        All data
+      </Button>
+    </Grid>
+    <Grid item xs={1}>
+      <Button onClick={handleDialogOpen} variant="contained" fullWidth>
+        Wire condition
+      </Button>
+    </Grid>
+
+    {/* Fifth Row */}
+    <Grid item xs={1}>
+      <Button onClick={handleDialogOpen} variant="contained" fullWidth>
+        Insulator
+      </Button>
+    </Grid>
+  </Grid>
 
       {/* Dialog Component */}
       <Dialog open={openDialog} onClose={handleDialogClose}>
