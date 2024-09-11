@@ -41,8 +41,7 @@ import {
 
 import { useNavigate } from "react-router-dom";
 
-import axios from "axios";
-let framesArray = [];
+
 const CameraView = () => {
   const navigate = useNavigate();
   const [cameraError, setCameraError] = useState(null);
@@ -68,7 +67,9 @@ const CameraView = () => {
   });
   const [formErrors, setFormErrors] = useState({});
   const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [currentFrame, setCurrentFrame] = useState(null);
   const videoRef = useRef(null);
+  const frameRef = useRef(null);
   const canvasRef = useRef(null);
   const [isStreaming, setIsStreaming] = useState(false);
   const [isRecording, setIsRecording] = useState(true);
@@ -94,63 +95,97 @@ const CameraView = () => {
     loadFFmpeg();
   }, [ffmpeg]);
   useEffect(() => {
-    const fetchFrames = async () => {
-     // setIsLoading(true);
+    const eventSource = new EventSource('http://127.0.0.1:5000/process-camera-feed');
+
+    eventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+
+        if (data.processed_frame) {
+          setCurrentFrame(data.processed_frame);
+          setContactPoints(data.contact_points);
+          setHeight(data.pantograph_height);
+        }
+      } catch (error) {
+        console.error("Error parsing event data:", error);
+        
+      }
+    };
+
+    eventSource.onerror = () => {
+      console.error("Error connecting to server:");
+    };
+
+    return () => {
+      eventSource.close();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (currentFrame && frameRef.current) {
+      frameRef.current.src = `data:image/jpeg;base64,${currentFrame}`;
+    }
+  }, [currentFrame]);
+ 
+  console.log('f',frames)
+  // useEffect(() => {
+  //   const fetchFrames = async () => {
+  //    // setIsLoading(true);
   
      
   
-      try {
-        const response = await fetch("http://127.0.0.1:5000/process-camera-feed");
+  //     try {
+  //       const response = await fetch("http://127.0.0.1:5000/process-camera-feed");
   
-        if (!response.body) {
-          throw new Error("ReadableStream not supported or no body in response");
-        }
+  //       if (!response.body) {
+  //         throw new Error("ReadableStream not supported or no body in response");
+  //       }
   
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        let buffer = '';
+  //       const reader = response.body.getReader();
+  //       const decoder = new TextDecoder();
+  //       let buffer = '';
   
-        // Process the stream
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
+  //       // Process the stream
+  //       while (true) {
+  //         const { done, value } = await reader.read();
+  //         if (done) break;
   
-          buffer += decoder.decode(value, { stream: true });
-         // console.log('buffer',buffer)
-          // Split buffer by newlines to get frames
-          const frames = buffer.split('\n');
-          buffer = frames.pop(); // Keep any incomplete frame in buffer
+  //         buffer += decoder.decode(value, { stream: true });
+  //        // console.log('buffer',buffer)
+  //         // Split buffer by newlines to get frames
+  //         const frames = buffer.split('\n');
+  //         buffer = frames.pop(); // Keep any incomplete frame in buffer
   
-          frames.forEach((frame) => {
-            if (frame) {
-              try {
-                const parsedFrame = JSON.parse(frame); // Parse the frame as JSON
-                if (parsedFrame.processed_frame) {
-                  framesArray.push(parsedFrame.processed_frame);
-                  setFrames(parsedFrame.processed_frame); // Update state with new frame
-                  setContactPoints(parsedFrame?.contact_points);
-                  setHeight(parsedFrame?.pantograph_height);
-                }
-              } catch (error) {
-                console.error("Error parsing frame:", error);
-              }
-            }
-          });
-        }
+  //         frames.forEach((frame) => {
+  //           if (frame) {
+  //             try {
+  //               const parsedFrame = JSON.parse(frame); // Parse the frame as JSON
+  //               if (parsedFrame.processed_frame) {
+  //                 framesArray.push(parsedFrame.processed_frame);
+  //                 setFrames(parsedFrame.processed_frame); // Update state with new frame
+  //                 setContactPoints(parsedFrame?.contact_points);
+  //                 setHeight(parsedFrame?.pantograph_height);
+  //               }
+  //             } catch (error) {
+  //               console.error("Error parsing frame:", error);
+  //             }
+  //           }
+  //         });
+  //       }
   
-       // setIsLoading(false);
+  //      // setIsLoading(false);
   
-      } catch (error) {
-        console.error('Error processing video:', error);
-       // setIsLoading(false);
-      }
-    };
+  //     } catch (error) {
+  //       console.error('Error processing video:', error);
+  //      // setIsLoading(false);
+  //     }
+  //   };
    
-    if(!isPaused){
-      fetchFrames();
-    }
+  //   if(!isPaused){
+  //     fetchFrames();
+  //   }
 
-  }, [isPaused,isRecording]);
+  // }, [isPaused,isRecording]);
   const saveVideo = async () => {
     if (!ffmpegLoaded) {
       await ffmpeg.load();
@@ -159,8 +194,8 @@ const CameraView = () => {
     setIsVideoProcessing(true);
  
     // Save each frame as an image file in FFmpeg's virtual file system
-    for (let i = 0; i < framesArray.length; i++) {
-      const frame = framesArray[i];
+    for (let i = 0; i < frames.length; i++) {
+      const frame = frames[i];
       
       await ffmpeg.writeFile(`frame${i}.jpg`, await fetchFile(`data:image/jpeg;base64,${frame}`));
     }
@@ -481,7 +516,6 @@ const CameraView = () => {
             <Grid item xs={12} md={5.5}>
               {/* Line Dropdown */}
               <TextField
-              
                 label="Line"
                 name="line"
                 fullWidth
@@ -492,7 +526,6 @@ const CameraView = () => {
                 error={hasSubmitted && !!formErrors.line}
                 helperText={hasSubmitted && formErrors.line}
               />
-               
             </Grid>
             <Grid item xs={12} md={5.5}>
               <TextField
@@ -723,15 +756,16 @@ const CameraView = () => {
                   </Typography>
                 </Box>
               ) : (
-                frames && (
+              
                   <img
                     id="webcam"
+                    ref={frameRef}
+          
+                    src=""
+                    alt={`Frame`}
                     style={{ width: "100%", height: "100%" }}
-                    src={`data:image/jpeg;base64,${frames}`}
-                    alt="Camera Feed"
-                    ref={videoRef}
                   />
-                )
+              
               )}
               <video ref={videoRef} style={{ display: "none" }} />
               <canvas ref={canvasRef} style={{ display: "none" }} />
@@ -749,16 +783,20 @@ const CameraView = () => {
                   {isFullScreen ? <FullscreenExit /> : <Fullscreen />}
                 </IconButton>
               </Box>
-               <Box sx={{ position: "absolute", top: 10, left: 10 }}>
-               <Typography variant="h6" sx={{ color: "white" }}>
+              <Box sx={{ position: "absolute", top: 10, left: 10 }}>
+                <Typography variant="h6" sx={{ color: "white" }}>
                   Contact Points:{" "}
-                  <span style={{ color: "teal", fontWeight: 800 }}>{contactPoints}</span>
+                  <span style={{ color: "teal", fontWeight: 800 }}>
+                    {contactPoints}
+                  </span>
                 </Typography>
                 <Typography variant="h6" sx={{ color: "white" }}>
                   PantoHeight:{" "}
-                  <span style={{ color: "teal", fontWeight: 800 }}>{height}</span>
+                  <span style={{ color: "teal", fontWeight: 800 }}>
+                    {height}
+                  </span>
                 </Typography>
-              </Box> 
+              </Box>
             </Box>
 
             <Divider sx={{ marginY: 2 }} />
@@ -802,21 +840,23 @@ const CameraView = () => {
               >
                 Last: 00/00 | Current: 00/00 | Next: 00/00
               </Typography>
-              {!videoUrl && <Button
-                startIcon={<Pause />}
-                variant="contained"
-                sx={{ background: "teal" }}
-                onClick={saveVideo}
-              >
-                SAVE AND EXIT
-              </Button>}
+              {!videoUrl && (
+                <Button
+                  startIcon={<Pause />}
+                  variant="contained"
+                  sx={{ background: "teal" }}
+                  onClick={saveVideo}
+                >
+                  SAVE AND EXIT
+                </Button>
+              )}
               {videoUrl && (
-        <a href={videoUrl} download="processed_video.mp4">
-          <Button variant="contained" color="primary">
-            Download Video
-          </Button>
-        </a>
-      )}
+                <a href={videoUrl} download="processed_video.mp4">
+                  <Button variant="contained" color="primary">
+                    Download Video
+                  </Button>
+                </a>
+              )}
               {/* <Button startIcon={<SpeedIcon />} sx={{ background: 'blue', color: 'white' }}>
               Speed: 000.00 KMPH
             </Button> */}
@@ -1141,8 +1181,7 @@ const CameraView = () => {
           </Button>
         </DialogActions>
       </Dialog>
-   
-     
+
       <Dialog
         open={openNavigateDialog}
         onClose={() => setOpenNavigateDialog(false)}

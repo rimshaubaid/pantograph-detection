@@ -6,6 +6,7 @@ import {
   Typography,
   TextField,
   Button,
+  Menu,
   MenuItem,
   Select,
   InputLabel,
@@ -38,6 +39,35 @@ const SparkDataView = () => {
   const handleFileTypeChange = (event) => setFileType(event.target.value);
   const [page, setPage] = useState(0); // For pagination
   const [rowsPerPage, setRowsPerPage] = useState(10); // Rows per page
+  const [anchorGradientEl, setAnchorGradientEl] = useState(null);
+  const [anchorWireEl, setAnchorWireEl] = useState(null);
+  const handleMenuGradientOpen = (event) => {
+    setAnchorGradientEl(event.currentTarget);
+  };
+
+  const handleGraidentMenuClose = () => {
+    setAnchorGradientEl(null);
+  };
+
+  const handleGradientOptionClick = (option) => {
+    handleGraidentMenuClose(); // Close the menu
+    handleDialogOpen(option); // Pass the selected option
+  };
+
+  const handleMenuWireOpen = (event) => {
+    setAnchorWireEl(event.currentTarget);
+  };
+
+  const handleWireMenuClose = () => {
+    setAnchorWireEl(null);
+  };
+
+  const handleWireOptionClick = (option) => {
+    handleWireMenuClose(); // Close the menu
+    handleDialogOpen(option); // Pass the selected option
+  };
+
+ 
   const handleDownload = () => {
     
       if (data.length === 0) {
@@ -155,7 +185,7 @@ const SparkDataView = () => {
         <Grid item  xs={8}>
           <Paper sx={{ padding: 3, bgcolor: "#2c2c2c" }}>
             <Grid container spacing={2}>
-              <Grid item xs={6} md={3}>
+              <Grid item  xs={3}>
                 <FormControl
                   fullWidth
                   sx={{ bgcolor: "#333", borderRadius: 1 }}
@@ -167,7 +197,7 @@ const SparkDataView = () => {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={6} md={3}>
+              <Grid item  xs={3}>
                 <TextField
                   label="Session"
                   variant="outlined"
@@ -175,8 +205,8 @@ const SparkDataView = () => {
                   sx={{ bgcolor: "#333", borderRadius: 1 }}
                 />
               </Grid>
-              <Grid item xs={6} md={3}>
-               <Button variant="outlined">Generate</Button>
+              <Grid item  xs={3}>
+               <Button variant="contained">Generate</Button>
               </Grid>
             </Grid>
 
@@ -265,14 +295,14 @@ const SparkDataView = () => {
                   color="primary"
                   sx={{ marginRight: 2 }}
                 >
-                  Update Records
+                       <Typography style={{fontSize:"1vw"}}>Update Records</Typography>
                 </Button>
                 <Button
                   variant="contained"
                   color="secondary"
                   onClick={handleDownload}
                 >
-                  Download Report
+                  <Typography style={{fontSize:"1vw"}}>Download Report</Typography>
                 </Button>
               </Box>
             </Box>
@@ -282,7 +312,7 @@ const SparkDataView = () => {
         </Grid>
       
 
-        <Grid item xs={12} md={4}>
+        <Grid item  xs={4}>
           <Card sx={{ bgcolor: "#333", color: "#00E5FF" }}>
             <CardContent>
               <Box
@@ -294,16 +324,16 @@ const SparkDataView = () => {
               >
                 <PhotoCamera sx={{ fontSize: 100 }} />
               </Box>
-              <Typography variant="body1">Route: 00000.00000</Typography>
-              <Typography variant="body1">Section: </Typography>
-              <Typography variant="body1">Longitude: 00000.00000</Typography>
-              <Typography variant="body1">Latitude: 00000.00000</Typography>
-              <Typography variant="body1">Height: 000.00 (Mtrs)</Typography>
-              <Typography variant="body1">Speed: 000.00 (KMPH)</Typography>
-              <Typography variant="body1">Satellites: 00</Typography>
-              <Typography variant="body1">Intensity: 000</Typography>
-              <Typography variant="body1">Distance: 00.00m</Typography>
-              <Typography variant="body1">
+              <Typography variant="body1" style={{fontSize:"1vw"}}>Route: 00000.00000</Typography>
+              <Typography variant="body1" style={{fontSize:"1vw"}}>Section: </Typography>
+              <Typography variant="body1" style={{fontSize:"1vw"}}>Longitude: 00000.00000</Typography>
+              <Typography variant="body1" style={{fontSize:"1vw"}}>Latitude: 00000.00000</Typography>
+              <Typography variant="body1" style={{fontSize:"1vw"}}>Height: 000.00 (Mtrs)</Typography>
+              <Typography variant="body1" style={{fontSize:"1vw"}}>Speed: 000.00 (KMPH)</Typography>
+              <Typography variant="body1" style={{fontSize:"1vw"}}>Satellites: 00</Typography>
+              <Typography variant="body1" style={{fontSize:"1vw"}}>Intensity: 000</Typography>
+              <Typography variant="body1" style={{fontSize:"1vw"}}>Distance: 00.00m</Typography>
+              <Typography variant="body1" style={{fontSize:"1vw"}}>
                 Taken At: YYYY-MM-DD-HH:MM:SS
               </Typography>
             </CardContent>
@@ -315,55 +345,97 @@ const SparkDataView = () => {
     {/* First Row */}
     <Grid item xs={1}>
       <Button onClick={handleDialogOpen} variant="contained" fullWidth>
-        OHE Height
+        <Typography style={{fontSize:"1vw"}}>OHE Height</Typography>
+    
       </Button>
     </Grid>
     <Grid item xs={1}>
       <Button onClick={handleDialogOpen} variant="contained" fullWidth>
-        Stagger
+      <Typography style={{fontSize:"1vw"}}>Stagger</Typography>
       </Button>
     </Grid>
 
     {/* Second Row */}
     <Grid item xs={1}>
-      <Button onClick={handleDialogOpen} variant="contained" fullWidth>
-        Gradient
+      <Button onClick={handleMenuGradientOpen} variant="contained" fullWidth>
+      <Typography style={{fontSize:"1vw"}}>Gradient</Typography>
       </Button>
+
+      <Menu
+        anchorEl={anchorGradientEl}
+        open={Boolean(anchorGradientEl)}
+        onClose={handleGraidentMenuClose}
+      >
+        <MenuItem onClick={() => handleGradientOptionClick('Gradient - Descent & Relative Descent')}>
+          Gradient - Descent & Relative Descent
+        </MenuItem>
+        <MenuItem onClick={() => handleGradientOptionClick('3MM')}>
+          Graident Descent {">"} 3MM
+        </MenuItem>
+      </Menu>
     </Grid>
     <Grid item xs={1}>
       <Button onClick={handleDialogOpen} variant="contained" fullWidth>
-        IOL
+      <Typography style={{fontSize:"1vw"}}>IOL</Typography>
       </Button>
     </Grid>
 
     {/* Third Row */}
     <Grid item xs={1}>
       <Button onClick={handleDialogOpen} variant="contained" fullWidth>
-        UIOL
+      <Typography style={{fontSize:"1vw"}}>UIOL</Typography>
       </Button>
     </Grid>
     <Grid item xs={1}>
       <Button onClick={handleDialogOpen} variant="contained" fullWidth>
-        X/0 & T/0
+      <Typography style={{fontSize:"1vw"}}>X/0 & T/0</Typography>
       </Button>
     </Grid>
 
     {/* Fourth Row */}
     <Grid item xs={1}>
       <Button onClick={handleDialogOpen} variant="contained" fullWidth>
-        All data
+      <Typography style={{fontSize:"1vw"}}>All Data</Typography>
       </Button>
     </Grid>
     <Grid item xs={1}>
-      <Button onClick={handleDialogOpen} variant="contained" fullWidth>
-        Wire condition
+      <Button onClick={handleMenuWireOpen} variant="contained" fullWidth>
+      <Typography style={{fontSize:"1vw"}}>Wire condition</Typography>
       </Button>
+
+      <Menu
+        anchorEl={anchorWireEl}
+        open={Boolean(anchorWireEl)}
+        onClose={handleWireMenuClose}
+      >
+        <MenuItem onClick={() => handleWireOptionClick('Pantograph Flip')}>
+          Pantograph Flip
+        </MenuItem>
+        <MenuItem onClick={() => handleWireOptionClick('Bird Strikes')}>
+          Bird Strikes
+        </MenuItem>
+        <MenuItem onClick={() => handleWireOptionClick('Insufficient OHL Tension')}>
+          Insufficient OHL Tension
+        </MenuItem>
+        <MenuItem onClick={() => handleWireOptionClick('Bird Nest or any hanging clothes or foreign particle')}>
+          Bird Nest or any hanging clothes or foreign particle
+        </MenuItem>
+        <MenuItem onClick={() => handleWireOptionClick('Kinks, Twist, Damaged strands of catenary')}>
+          Kinks, Twist, Damaged strands of catenary
+        </MenuItem>
+        <MenuItem onClick={() => handleWireOptionClick('PG Clamps & Jumpers')}>
+          PG Clamps & Jumpers
+        </MenuItem>
+        <MenuItem onClick={() => handleWireOptionClick('Damaged Droppers')}>
+          Damaged Droppers
+        </MenuItem>
+      </Menu>
     </Grid>
 
     {/* Fifth Row */}
     <Grid item xs={1}>
       <Button onClick={handleDialogOpen} variant="contained" fullWidth>
-        Insulator
+      <Typography style={{fontSize:"1vw"}}>Insulator</Typography>
       </Button>
     </Grid>
   </Grid>
