@@ -22,6 +22,7 @@ import {
   TableBody,
 } from "@mui/material";
 import { FFmpeg } from '@ffmpeg/ffmpeg';
+import axios from "axios";
 import { fetchFile } from '@ffmpeg/util';
 import {
   Fullscreen,
@@ -82,6 +83,27 @@ const CameraView = () => {
   const [frames, setFrames] = useState([]);
   const [contactPoints,setContactPoints] = useState(null);
   const [height,setHeight] = useState(null);
+  const [routeData,setRouteData] = useState([]);
+  useEffect(() => {
+    getRouteData();
+  },[])
+  const getRouteData = async () => {
+    try {
+      const response = await axios.get(
+        "http://127.0.0.1:5000/fetch-route-data"
+      );
+      const data = response?.data?.data;
+
+      // Extract only the Route names
+      const routes = data.map(item => item.Route);
+
+      // Set state with Route names
+      setRouteData(routes);
+    } catch (err) {
+
+    }
+  };
+  
   useEffect(() => {
     const loadFFmpeg = async () => {
       try {
@@ -127,7 +149,7 @@ const CameraView = () => {
     }
   }, [currentFrame]);
  
-  console.log('f',frames)
+  
   // useEffect(() => {
   //   const fetchFrames = async () => {
   //    // setIsLoading(true);
@@ -504,9 +526,11 @@ const CameraView = () => {
                 error={hasSubmitted && !!formErrors.route}
                 helperText={hasSubmitted && formErrors.route}
               >
-                <MenuItem value="Route 1">Route 1</MenuItem>
-                <MenuItem value="Route 2">Route 2</MenuItem>
-                <MenuItem value="Route 3">Route 3</MenuItem>
+                {routeData && routeData.map((route, index) => (
+                  <MenuItem key={index} value={route}>
+                    {route}
+                  </MenuItem>
+                ))}
                 {/* Add more routes as needed */}
               </TextField>
             </Grid>
@@ -756,16 +780,13 @@ const CameraView = () => {
                   </Typography>
                 </Box>
               ) : (
-              
-                  <img
-                    id="webcam"
-                    ref={frameRef}
-          
-                    src=""
-                    alt={`Frame`}
-                    style={{ width: "100%", height: "100%" }}
-                  />
-              
+                <img
+                  id="webcam"
+                  ref={frameRef}
+                  src=""
+                  alt={`Frame`}
+                  style={{ width: "100%", height: "100%" }}
+                />
               )}
               <video ref={videoRef} style={{ display: "none" }} />
               <canvas ref={canvasRef} style={{ display: "none" }} />

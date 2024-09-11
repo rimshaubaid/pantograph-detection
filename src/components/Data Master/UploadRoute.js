@@ -63,6 +63,7 @@ const UploadRouteData = () => {
         alert(`Error: ${response.data.error}`);
       } else {
         alert("File uploaded successfully!");
+        getRouteData();
       }
     } catch (error) {
       console.error("Error uploading file:", error);
