@@ -58,6 +58,7 @@ const CameraView = () => {
     route: "",
     line: "", // Added line for the Line dropdown
     crew: "",
+    pantographHeight:"",
     associatingStaff: "",
     pantographModel: "",
     typeOfOHE: "",
@@ -579,6 +580,21 @@ const CameraView = () => {
             </Grid>
             <Grid item xs={12} md={5.5}>
               <TextField
+                label="Pantograph Height"
+                name="pantographHeight"
+                fullWidth
+                margin="normal"
+                value={formValues.pantographHeight}
+                onChange={handleChange}
+                required
+                error={hasSubmitted && !!formErrors.pantographHeight}
+                helperText={hasSubmitted && formErrors.pantographHeight}
+              />
+            </Grid>
+          </Grid>
+          <Grid container justifyContent="space-between">
+            <Grid item xs={12} md={5.5}>
+            <TextField
                 label="Pantograph Model"
                 name="pantographModel"
                 fullWidth
@@ -589,11 +605,10 @@ const CameraView = () => {
                 error={hasSubmitted && !!formErrors.pantographModel}
                 helperText={hasSubmitted && formErrors.pantographModel}
               />
+             
             </Grid>
-          </Grid>
-          <Grid container justifyContent="space-between">
             <Grid item xs={12} md={5.5}>
-              <TextField
+            <TextField
                 label="Type of OHE"
                 name="typeOfOHE"
                 fullWidth
@@ -602,8 +617,10 @@ const CameraView = () => {
                 onChange={handleChange}
               />
             </Grid>
+          </Grid>
+          <Grid container justifyContent="space-between">
             <Grid item xs={12} md={5.5}>
-              <TextField
+            <TextField
                 label="Sag"
                 name="sag"
                 fullWidth
@@ -611,11 +628,10 @@ const CameraView = () => {
                 value={formValues.sag}
                 onChange={handleChange}
               />
+             
             </Grid>
-          </Grid>
-          <Grid container justifyContent="space-between">
             <Grid item xs={12} md={5.5}>
-              <TextField
+            <TextField
                 label="Tension in wire"
                 name="tensionInWire"
                 fullWidth
@@ -623,8 +639,10 @@ const CameraView = () => {
                 value={formValues.tensionInWire}
                 onChange={handleChange}
               />
+             
             </Grid>
-            <Grid item xs={12} md={5.5}>
+            <Grid container justifyContent="space-between">
+              <Grid item xs={12} md={5.5}> 
               <TextField
                 select
                 label="Weather condition"
@@ -639,9 +657,8 @@ const CameraView = () => {
                 <MenuItem value="Ice">Ice</MenuItem>
                 <MenuItem value="Temp">Temperature</MenuItem>
                 {/* Add more lines as needed */}
-              </TextField>
-            </Grid>
-            {formValues.weather === "Temp" && (
+              </TextField></Grid>
+              {formValues.weather === "Temp" && (
               <Grid item xs={12} md={5.5}>
                 <TextField
                   label="Temperature"
@@ -653,6 +670,8 @@ const CameraView = () => {
                 />
               </Grid>
             )}
+            </Grid>
+           
           </Grid>
         </DialogContent>
         <DialogActions>
