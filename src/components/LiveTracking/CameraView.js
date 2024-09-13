@@ -42,8 +42,9 @@ import {
 
 import { useNavigate } from "react-router-dom";
 
-
+const apiUrl = process.env.REACT_APP_API_URL;
 const CameraView = () => {
+  
   const navigate = useNavigate();
   const [cameraError, setCameraError] = useState(null);
   const [isNightMode, setIsNightMode] = useState(true);
@@ -90,13 +91,14 @@ const CameraView = () => {
   const [contactPoints,setContactPoints] = useState(null);
   const [height,setHeight] = useState(null);
   const [routeData,setRouteData] = useState([]);
+  console.log('a',apiUrl)
   useEffect(() => {
     getRouteData();
   },[])
   const getRouteData = async () => {
     try {
       const response = await axios.get(
-        "http://127.0.0.1:5000/fetch-route-data"
+        `${apiUrl}/fetch-route-data`
       );
       const data = response?.data?.data;
 
@@ -126,26 +128,36 @@ const CameraView = () => {
     setHasSubmitted(true);
     const errors = validateForm();
     setFormErrors(errors);
-
+  
     if (Object.keys(errors).length === 0) {
-      
-      // Submit form if no errors
-      const routeData = {
-        current_route: formValues.route,
-      };
-      const response = await axios.post("http://127.0.0.1:5000/set-route", {
-        routeData, // Sending the route in the request body
-      });
-    //  console.log('res',response);
-     // console.log('Form submitted:', formValues);
-
-      setOpenModal(false);
+      try {
+        // Submit form if no errors
+        const routeData = {
+          current_route: formValues.route,
+        };
+  
+        const response = await axios.post(`${apiUrl}/set-route`, {
+          routeData, // Sending the route in the request body
+        });
+  
+        // Handle successful response here (e.g., logging the response)
+        // console.log('res', response);
+        // console.log('Form submitted:', formValues);
+  
+        setOpenModal(false);
+      } catch (error) {
+        // Handle any errors that occur during the API call
+        console.error('Error submitting form:', error);
+      }
     }
   };
+  
   useEffect(() => {
-
+    if (!formValues?.route) {
+      return; // Do not proceed if formValues.route doesn't exist
+    }
    
-      const eventSource = new EventSource(`http://127.0.0.1:5000/process-camera-feed?route=${formValues?.route}`);
+      const eventSource = new EventSource(`${apiUrl}/process-camera-feed?route=${formValues?.route}`);
 
       eventSource.onmessage = (event) => {
         try {

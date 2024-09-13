@@ -27,7 +27,7 @@ import {
 } from "@mui/material";
 import { PhotoCamera } from "@mui/icons-material";
 import axios from "axios";
-
+const apiUrl = process.env.REACT_APP_API_URL;
 const SparkDataView = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [format, setFormat] = useState("text");
@@ -158,7 +158,7 @@ const SparkDataView = () => {
   const getData = async () => {
     try {
       const response = await axios.get(
-        "http://127.0.0.1:5000/fetch-report-data"
+        `${apiUrl}/fetch-report-data`
       );
 
       setData(response?.data?.data); // Set the fetched data into state

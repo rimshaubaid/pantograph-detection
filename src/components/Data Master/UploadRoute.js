@@ -13,7 +13,7 @@ import {
   TableHead
 } from '@mui/material';
 import axios from 'axios';
-
+const apiUrl = process.env.REACT_APP_API_URL;
 const UploadRouteData = () => {
   const [fileName, setFileName] = useState('');
   const [file, setFile] = useState(null);
@@ -33,7 +33,7 @@ const UploadRouteData = () => {
   const getRouteData = async () => {
     try {
       const response = await axios.get(
-        "http://127.0.0.1:5000/fetch-route-data"
+        `${apiUrl}/fetch-route-data`
       );
       setData(response?.data?.data);
     } catch (err) {
@@ -52,7 +52,7 @@ const UploadRouteData = () => {
 
     try {
       const response = await axios.post(
-        "http://127.0.0.1:5000/upload-route-data",
+        `${apiUrl}/upload-route-data`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
