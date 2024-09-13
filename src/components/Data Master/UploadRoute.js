@@ -129,7 +129,7 @@ const UploadRouteData = () => {
                     <TableCell>{row.Route}</TableCell>
                     <TableCell>{row.Section}</TableCell>
                     <TableCell>{row.Location}</TableCell>
-                    <TableCell>{row.Longtitude}</TableCell>
+                    <TableCell>{row.Longitude}</TableCell>
                     <TableCell>{row.Latitude}</TableCell>
                     <TableCell>{row.Height}</TableCell>
                     <TableCell>{row.FeatureENG}</TableCell>
