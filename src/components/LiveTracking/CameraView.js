@@ -501,9 +501,7 @@ const CameraView = () => {
   };
 
  
-
- 
-
+ console.log('prev',prevLocation)
 
   return (
     <Box
