@@ -50,8 +50,13 @@ const CameraView = () => {
   const [isGPS, setIsGPS] = useState(true);
   const [isVideoProcessing, setIsVideoProcessing] = useState(false);
   const [videoUrl, setVideoUrl] = useState(null);
+  const [lang,setLang] = useState(0);
+  const [lat,setLat] = useState(0);
   const [openModal, setOpenModal] = useState(true);
   const [ffmpegLoaded, setFfmpegLoaded] = useState(false);
+  const [prevLocation,setPrevLocation] = useState("");
+  const [currLocation,setCurrLocation] = useState("");
+  const [nextLocation,setNextLocation] = useState("");
   const ffmpeg = useRef(new FFmpeg()).current;
   const [formValues, setFormValues] = useState({
     trainNo: "", // Added trainNo for the Train/Loco No text field
@@ -117,38 +122,71 @@ const CameraView = () => {
 
     loadFFmpeg();
   }, [ffmpeg]);
+  const handleSubmit = async () => {
+    setHasSubmitted(true);
+    const errors = validateForm();
+    setFormErrors(errors);
+
+    if (Object.keys(errors).length === 0) {
+      
+      // Submit form if no errors
+      const routeData = {
+        current_route: formValues.route,
+      };
+      const response = await axios.post("http://127.0.0.1:5000/set-route", {
+        routeData, // Sending the route in the request body
+      });
+    //  console.log('res',response);
+     // console.log('Form submitted:', formValues);
+
+      setOpenModal(false);
+    }
+  };
   useEffect(() => {
-    const eventSource = new EventSource('http://127.0.0.1:5000/process-camera-feed');
 
-    eventSource.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
+   
+      const eventSource = new EventSource(`http://127.0.0.1:5000/process-camera-feed?route=${formValues?.route}`);
 
-        if (data.processed_frame) {
-          setCurrentFrame(data.processed_frame);
-          setContactPoints(data.contact_points);
-          setHeight(data.pantograph_height);
+      eventSource.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+  
+          if (data.processed_frame) {
+            setCurrentFrame(data.processed_frame);
+            setContactPoints(data.contact_points);
+            setHeight(data.pantograph_height);
+            setLang(data.longitude);
+            setLat(data.latitude);
+            setCurrLocation(data.current_location);
+            setPrevLocation(data.previous_location);
+            setNextLocation(data.next_location);
+          }
+        } catch (error) {
+          console.error("Error parsing event data:", error);
+          
         }
-      } catch (error) {
-        console.error("Error parsing event data:", error);
-        
-      }
-    };
-
-    eventSource.onerror = () => {
-      console.error("Error connecting to server:");
-    };
-
+      };
+  
+      eventSource.onerror = () => {
+        console.error("Error connecting to server:");
+      };
+  
+     
+     
     return () => {
       eventSource.close();
     };
-  }, []);
+  }, [handleSubmit]);
+
+ 
 
   useEffect(() => {
     if (currentFrame && frameRef.current) {
       frameRef.current.src = `data:image/jpeg;base64,${currentFrame}`;
     }
   }, [currentFrame]);
+
+ 
  
   
   // useEffect(() => {
@@ -462,17 +500,9 @@ const CameraView = () => {
     return errors;
   };
 
-  const handleSubmit = () => {
-    setHasSubmitted(true);
-    const errors = validateForm();
-    setFormErrors(errors);
+ 
 
-    if (Object.keys(errors).length === 0) {
-      // Submit form if no errors
-      console.log('Form submitted:', formValues);
-      setOpenModal(false);
-    }
-  };
+ 
 
 
   return (
@@ -824,16 +854,78 @@ const CameraView = () => {
                 </IconButton>
               </Box>
               <Box sx={{ position: "absolute", top: 10, left: 10 }}>
-                <Typography variant="h6" sx={{ color: "white" }}>
-                  Contact Points:{" "}
+                <Typography variant="body2" sx={{ color: "white" }}>
+                  CP 1:{" "}
                   <span style={{ color: "teal", fontWeight: 800 }}>
-                    {contactPoints}
+                    {contactPoints && contactPoints[0]}
                   </span>
                 </Typography>
-                <Typography variant="h6" sx={{ color: "white" }}>
+                <Typography variant="body2" sx={{ color: "white" }}>
+                  CP 1:{" "}
+                  <span style={{ color: "teal", fontWeight: 800 }}>
+                    {contactPoints && contactPoints[0]}
+                  </span>
+                </Typography>
+                <Typography variant="body2" sx={{ color: "white" }}>
+                  CP 2:{" "}
+                  <span style={{ color: "teal", fontWeight: 800 }}>
+                    {contactPoints && contactPoints[1]}
+                  </span>
+                </Typography>
+                <Typography variant="body2" sx={{ color: "white" }}>
+                  CP 3:{" "}
+                  <span style={{ color: "teal", fontWeight: 800 }}>
+                    {contactPoints && contactPoints[2]}
+                  </span>
+                </Typography>
+                <Typography variant="body2" sx={{ color: "white" }}>
+                  CP 4:{" "}
+                  <span style={{ color: "teal", fontWeight: 800 }}>
+                    {contactPoints && contactPoints[3]}
+                  </span>
+                </Typography>
+                <Typography variant="body2" sx={{ color: "white" }}>
+                  CP 5:{" "}
+                  <span style={{ color: "teal", fontWeight: 800 }}>
+                    {contactPoints && contactPoints[4]}
+                  </span>
+                </Typography>
+                <Typography variant="body2" sx={{ color: "white" }}>
                   PantoHeight:{" "}
                   <span style={{ color: "teal", fontWeight: 800 }}>
                     {height}
+                  </span>
+                </Typography>
+              </Box>
+              <Box sx={{ position: "absolute", bottom: 10, left: 10 }}>
+                <Typography variant="body2" sx={{ color: "white" }}>
+                 Lat:{" "}
+                  <span style={{ color: "teal", fontWeight: 800 }}>
+                    {lat}
+                  </span>
+                </Typography>
+                <Typography variant="body2" sx={{ color: "white" }}>
+                  Long:{" "}
+                  <span style={{ color: "teal", fontWeight: 800 }}>
+                    {lang}
+                  </span>
+                </Typography>
+                <Typography variant="body2" sx={{ color: "white" }}>
+                  Current Location:{" "}
+                  <span style={{ color: "teal", fontWeight: 800 }}>
+                    {currLocation}
+                  </span>
+                </Typography>
+                <Typography variant="body2" sx={{ color: "white" }}>
+                  Previous Location:{" "}
+                  <span style={{ color: "teal", fontWeight: 800 }}>
+                    {prevLocation}
+                  </span>
+                </Typography>
+                <Typography variant="body2" sx={{ color: "white" }}>
+                  Next Location:{" "}
+                  <span style={{ color: "teal", fontWeight: 800 }}>
+                    {nextLocation}
                   </span>
                 </Typography>
               </Box>
@@ -950,23 +1042,23 @@ const CameraView = () => {
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                 <Straighten sx={{ marginRight: 1 }} />
-                <Typography style={{ fontSize: "1vw" }}>CP 1: 00</Typography>
+                <Typography style={{ fontSize: "1vw" }}>CP 1: {contactPoints && (contactPoints?.[0] || "-")}</Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                 <Straighten sx={{ marginRight: 1 }} />
-                <Typography style={{ fontSize: "1vw" }}>CP 2: 00</Typography>
+                <Typography style={{ fontSize: "1vw" }}>CP 2: {contactPoints && (contactPoints?.[1] || "-")}</Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                 <Straighten sx={{ marginRight: 1 }} />
-                <Typography style={{ fontSize: "1vw" }}>CP 3: 00</Typography>
+                <Typography style={{ fontSize: "1vw" }}>CP 3: {contactPoints && (contactPoints?.[2] || "-")}</Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                 <Straighten sx={{ marginRight: 1 }} />
-                <Typography style={{ fontSize: "1vw" }}>CP 4: 00</Typography>
+                <Typography style={{ fontSize: "1vw" }}>CP 4: {contactPoints && (contactPoints?.[3] || "-")}</Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                 <Straighten sx={{ marginRight: 1 }} />
-                <Typography style={{ fontSize: "1vw" }}>CP 5: 00</Typography>
+                <Typography style={{ fontSize: "1vw" }}>CP 5: {contactPoints && (contactPoints?.[4] || "-")}</Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                 <SwapHoriz sx={{ marginRight: 1 }} />
@@ -1062,7 +1154,7 @@ const CameraView = () => {
                   <Explore sx={{ marginRight: 1 }} />
                   <Typography style={{ fontSize: "1vw" }}>Longitude</Typography>
                 </Box>
-                <Typography style={{ fontSize: "1vw" }}>0</Typography>
+                <Typography style={{ fontSize: "1vw" }}>{lang}</Typography>
               </Box>
 
               <Box
@@ -1076,7 +1168,7 @@ const CameraView = () => {
                   <Explore sx={{ marginRight: 1 }} />
                   <Typography style={{ fontSize: "1vw" }}>Latitude</Typography>
                 </Box>
-                <Typography style={{ fontSize: "1vw" }}>0</Typography>
+                <Typography style={{ fontSize: "1vw" }}>{lat}</Typography>
               </Box>
 
               <Box
