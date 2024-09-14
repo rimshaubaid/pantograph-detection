@@ -87,6 +87,9 @@ const CameraView = () => {
   const [openResumeDialog, setOpenResumeDialog] = useState(false);
   const [openNavigateDialog, setOpenNavigateDialog] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [cameras,setCameras] = useState([]);
+  const [selectedCamera,setSelectedCamera] = useState(null);
+  const [selectedResolution,setSelectedResolution] = useState(null);
  // const [loading,setLoading] = useState()
   const [frames, setFrames] = useState([]);
   const [contactPoints,setContactPoints] = useState(null);
@@ -146,63 +149,91 @@ const CameraView = () => {
     setHasSubmitted(true);
     const errors = validateForm();
     setFormErrors(errors);
-  
+
     if (Object.keys(errors).length === 0) {
       try {
         // Submit form if no errors
         const routeData = {
           current_route: formValues.route,
         };
-  
-        const response = await axios.post(`${apiUrl}/set-route`, {
+
+         await axios.post(`${apiUrl}/set-route`, {
           routeData, // Sending the route in the request body
         });
-  
-        // Handle successful response here (e.g., logging the response)
-        // console.log('res', response);
-        // console.log('Form submitted:', formValues);
-  
+
+      
+
         setOpenModal(false);
       } catch (error) {
         // Handle any errors that occur during the API call
-        console.error('Error submitting form:', error);
+        console.error("Error submitting form:", error);
       }
     }
   };
-  
+
+  useEffect(() => {
+    //if camera isnt selected
+    const cam = localStorage.getItem("camera_type");
+    const res =  localStorage.getItem("resolution");
+    if (!cam) {
+      setSelectedCamera(cameras?.[0]?.camera_type);
+    } else {
+      setSelectedCamera(cam);
+    }
+    if(res){
+      setSelectedResolution(res)
+    } else {
+      setSelectedResolution(cameras?.[0]?.resolution);
+    }
+  }, []);
+
+ //console.log('s',selectedCamera,selectedResolution)
+
+  useEffect(() => {
+    // Fetch the list of connected cameras
+    const getCameras = async () => {
+      try {
+        const response = await axios.get(`${apiUrl}/list-cameras`);
+        setCameras(response.data.cameras)
+      } catch (error) {
+        console.error('Error accessing media devices.', error);
+      }
+    };
+
+    getCameras();
+  }, []);
   useEffect(() => {
     if (!formValues?.route) {
       return; // Do not proceed if formValues.route doesn't exist
     }
-   
-      const eventSource = new EventSource(`${apiUrl}/process-camera-feed?route=${formValues?.route}`);
 
-      eventSource.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-  
-          if (data.processed_frame) {
-            setCurrentFrame(data.processed_frame);
-            setContactPoints(data.contact_points);
-            setHeight(data.pantograph_height);
-            setLang(data.longitude);
-            setLat(data.latitude);
-            setCurrLocation(data.current_location);
-            setPrevLocation(data.previous_location);
-            setNextLocation(data.next_location);
-          }
-        } catch (error) {
-          console.error("Error parsing event data:", error);
-          
+    const eventSource = new EventSource(
+      `${apiUrl}/process-camera-feed?camera_type=${selectedCamera}&resolution=${selectedResolution}&route=${formValues?.route}`
+    );
+
+    eventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+
+        if (data.processed_frame) {
+          setCurrentFrame(data.processed_frame);
+          setContactPoints(data.contact_points);
+          setHeight(data.pantograph_height);
+          setLang(data.longitude);
+          setLat(data.latitude);
+          setCurrLocation(data.current_location);
+          setPrevLocation(data.previous_location);
+          setNextLocation(data.next_location);
         }
-      };
-  
-      eventSource.onerror = () => {
-        console.error("Error connecting to server:");
-      };
-  
-     
-     
+      } catch (error) {
+        console.error("Error parsing event data:", error);
+      }
+    };
+
+    eventSource.onerror = () => {
+      console.error("Error connecting to server:");
+    };
+
     return () => {
       eventSource.close();
     };
@@ -216,67 +247,7 @@ const CameraView = () => {
     }
   }, [currentFrame]);
 
- 
- 
-  
-  // useEffect(() => {
-  //   const fetchFrames = async () => {
-  //    // setIsLoading(true);
-  
-     
-  
-  //     try {
-  //       const response = await fetch("http://127.0.0.1:5000/process-camera-feed");
-  
-  //       if (!response.body) {
-  //         throw new Error("ReadableStream not supported or no body in response");
-  //       }
-  
-  //       const reader = response.body.getReader();
-  //       const decoder = new TextDecoder();
-  //       let buffer = '';
-  
-  //       // Process the stream
-  //       while (true) {
-  //         const { done, value } = await reader.read();
-  //         if (done) break;
-  
-  //         buffer += decoder.decode(value, { stream: true });
-  //        // console.log('buffer',buffer)
-  //         // Split buffer by newlines to get frames
-  //         const frames = buffer.split('\n');
-  //         buffer = frames.pop(); // Keep any incomplete frame in buffer
-  
-  //         frames.forEach((frame) => {
-  //           if (frame) {
-  //             try {
-  //               const parsedFrame = JSON.parse(frame); // Parse the frame as JSON
-  //               if (parsedFrame.processed_frame) {
-  //                 framesArray.push(parsedFrame.processed_frame);
-  //                 setFrames(parsedFrame.processed_frame); // Update state with new frame
-  //                 setContactPoints(parsedFrame?.contact_points);
-  //                 setHeight(parsedFrame?.pantograph_height);
-  //               }
-  //             } catch (error) {
-  //               console.error("Error parsing frame:", error);
-  //             }
-  //           }
-  //         });
-  //       }
-  
-  //      // setIsLoading(false);
-  
-  //     } catch (error) {
-  //       console.error('Error processing video:', error);
-  //      // setIsLoading(false);
-  //     }
-  //   };
-   
-  //   if(!isPaused){
-  //     fetchFrames();
-  //   }
 
-  // }, [isPaused,isRecording]);
   const saveVideo = async () => {
     if (!ffmpegLoaded) {
       await ffmpeg.load();
@@ -531,7 +502,7 @@ const CameraView = () => {
   };
 
  
- console.log('prev',prevLocation)
+
 
   return (
     <Box
