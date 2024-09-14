@@ -87,13 +87,7 @@ const SparkDataView = () => {
         "Stagger 5",
         "Feature ENG",
         "Feature TRD",
-        "Frame Number",
-        "Height",
-        "Imp",
-        "Inclination",
-        "PantoHeight",
         
-        "Uplift Force",
       ];
   
       const csvRows = [headers.join(",")];
@@ -227,11 +221,11 @@ const SparkDataView = () => {
                     <TableCell>Stagger5</TableCell>
                     <TableCell>Feature ENG</TableCell>
                     <TableCell>Feature TRD</TableCell>
-                    <TableCell>Frame Number</TableCell>
+                    {/* <TableCell>Frame Number</TableCell>
                     <TableCell>Height</TableCell>
                     <TableCell>Imp</TableCell>
                     <TableCell>Inclination</TableCell>
-                    <TableCell>PantoHeight</TableCell>
+                    <TableCell>PantoHeight</TableCell> */}
                    
 
                   </TableRow>
@@ -252,11 +246,11 @@ const SparkDataView = () => {
                         <TableCell>{item.cp5 || "-"}</TableCell>
                         <TableCell>{item.feature_eng}</TableCell>
                         <TableCell>{item.feature_trd}</TableCell>
-                        <TableCell>{item.frame_number}</TableCell>
+                        {/* <TableCell>{item.frame_number}</TableCell>
                         <TableCell>{item.height}</TableCell>
                         <TableCell>{item.imp}</TableCell>
                         <TableCell>{item.inclination}</TableCell>
-                        <TableCell>{item.pantograph_height}</TableCell>
+                        <TableCell>{item.pantograph_height}</TableCell> */}
                         
                    
                       </TableRow>
@@ -322,20 +316,9 @@ const SparkDataView = () => {
                   marginBottom: 2,
                 }}
               >
-                <PhotoCamera sx={{ fontSize: 100 }} />
+                <PhotoCamera sx={{ fontSize: 200 }} />
               </Box>
-              <Typography variant="body1" style={{fontSize:"1vw"}}>Route: 00000.00000</Typography>
-              <Typography variant="body1" style={{fontSize:"1vw"}}>Section: </Typography>
-              <Typography variant="body1" style={{fontSize:"1vw"}}>Longitude: 00000.00000</Typography>
-              <Typography variant="body1" style={{fontSize:"1vw"}}>Latitude: 00000.00000</Typography>
-              <Typography variant="body1" style={{fontSize:"1vw"}}>Height: 000.00 (Mtrs)</Typography>
-              <Typography variant="body1" style={{fontSize:"1vw"}}>Speed: 000.00 (KMPH)</Typography>
-              <Typography variant="body1" style={{fontSize:"1vw"}}>Satellites: 00</Typography>
-              <Typography variant="body1" style={{fontSize:"1vw"}}>Intensity: 000</Typography>
-              <Typography variant="body1" style={{fontSize:"1vw"}}>Distance: 00.00m</Typography>
-              <Typography variant="body1" style={{fontSize:"1vw"}}>
-                Taken At: YYYY-MM-DD-HH:MM:SS
-              </Typography>
+             
             </CardContent>
           </Card>
         </Grid>

@@ -47,6 +47,7 @@ const CameraView = () => {
   
   const navigate = useNavigate();
   const [cameraError, setCameraError] = useState(null);
+  const [currentDateTime, setCurrentDateTime] = useState("");
   const [isNightMode, setIsNightMode] = useState(true);
   const [isGPS, setIsGPS] = useState(true);
   const [isVideoProcessing, setIsVideoProcessing] = useState(false);
@@ -91,7 +92,7 @@ const CameraView = () => {
   const [contactPoints,setContactPoints] = useState(null);
   const [height,setHeight] = useState(null);
   const [routeData,setRouteData] = useState([]);
-  console.log('a',apiUrl)
+  
   useEffect(() => {
     getRouteData();
   },[])
@@ -111,7 +112,24 @@ const CameraView = () => {
 
     }
   };
-  
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const now = new Date();
+      const formattedDateTime = now.toLocaleString("en-US", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false, 
+      });
+      setCurrentDateTime(formattedDateTime);
+    }, 1000); // Update every second
+
+    return () => clearInterval(timer); // Cleanup the interval on component unmount
+  }, []);
+
   useEffect(() => {
     const loadFFmpeg = async () => {
       try {
@@ -538,7 +556,21 @@ const CameraView = () => {
       >
         <DialogTitle>Select</DialogTitle>
         <DialogContent>
+          <Grid container justifyContent="center">
+          <TextField
+                label="Pantograph Height"
+                name="pantographHeight"
+                fullWidth
+                margin="normal"
+                value={formValues.pantographHeight}
+                onChange={handleChange}
+                required
+                error={hasSubmitted && !!formErrors.pantographHeight}
+                helperText={hasSubmitted && formErrors.pantographHeight}
+              />
+          </Grid>
           {/* Train/Loco No TextField */}
+
           <Grid container justifyContent="space-between">
             <Grid item xs={12} md={5.5}>
               <TextField
@@ -619,21 +651,6 @@ const CameraView = () => {
               />
             </Grid>
             <Grid item xs={12} md={5.5}>
-              <TextField
-                label="Pantograph Height"
-                name="pantographHeight"
-                fullWidth
-                margin="normal"
-                value={formValues.pantographHeight}
-                onChange={handleChange}
-                required
-                error={hasSubmitted && !!formErrors.pantographHeight}
-                helperText={hasSubmitted && formErrors.pantographHeight}
-              />
-            </Grid>
-          </Grid>
-          <Grid container justifyContent="space-between">
-            <Grid item xs={12} md={5.5}>
             <TextField
                 label="Pantograph Model"
                 name="pantographModel"
@@ -645,9 +662,11 @@ const CameraView = () => {
                 error={hasSubmitted && !!formErrors.pantographModel}
                 helperText={hasSubmitted && formErrors.pantographModel}
               />
-             
             </Grid>
+          </Grid>
+          <Grid container justifyContent="space-between">
             <Grid item xs={12} md={5.5}>
+            
             <TextField
                 label="Type of OHE"
                 name="typeOfOHE"
@@ -657,8 +676,6 @@ const CameraView = () => {
                 onChange={handleChange}
               />
             </Grid>
-          </Grid>
-          <Grid container justifyContent="space-between">
             <Grid item xs={12} md={5.5}>
             <TextField
                 label="Sag"
@@ -668,9 +685,11 @@ const CameraView = () => {
                 value={formValues.sag}
                 onChange={handleChange}
               />
-             
             </Grid>
+          </Grid>
+          <Grid container justifyContent="space-between">
             <Grid item xs={12} md={5.5}>
+           
             <TextField
                 label="Tension in wire"
                 name="tensionInWire"
@@ -679,11 +698,10 @@ const CameraView = () => {
                 value={formValues.tensionInWire}
                 onChange={handleChange}
               />
-             
             </Grid>
-            <Grid container justifyContent="space-between">
-              <Grid item xs={12} md={5.5}> 
-              <TextField
+            <Grid item xs={12} md={5.5}>
+            
+            <TextField
                 select
                 label="Weather condition"
                 name="weather"
@@ -697,7 +715,11 @@ const CameraView = () => {
                 <MenuItem value="Ice">Ice</MenuItem>
                 <MenuItem value="Temp">Temperature</MenuItem>
                 {/* Add more lines as needed */}
-              </TextField></Grid>
+              </TextField>
+            </Grid>
+            <Grid container justifyContent="space-between">
+              <Grid item xs={12} md={5.5}> 
+             </Grid>
               {formValues.weather === "Temp" && (
               <Grid item xs={12} md={5.5}>
                 <TextField
@@ -812,7 +834,7 @@ const CameraView = () => {
             </Typography>
           </Grid>
           <Grid item xs={2}>
-            <Typography style={{ fontSize: "1vw" }}>Time: HH:MM</Typography>
+            <Typography style={{ fontSize: "1vw" }}>Time: {currentDateTime}</Typography>
           </Grid>
         </Grid>
 
@@ -865,80 +887,70 @@ const CameraView = () => {
               </Box>
               <Box sx={{ position: "absolute", top: 10, left: 10 }}>
                 <Typography variant="body2" sx={{ color: "white" }}>
-                  CP 1:{" "}
+                {contactPoints && contactPoints[0] && "CP 1:"} 
                   <span style={{ color: "teal", fontWeight: 800 }}>
                     {contactPoints && contactPoints[0]}
                   </span>
                 </Typography>
+               
                 <Typography variant="body2" sx={{ color: "white" }}>
-                  CP 1:{" "}
-                  <span style={{ color: "teal", fontWeight: 800 }}>
-                    {contactPoints && contactPoints[0]}
-                  </span>
-                </Typography>
-                <Typography variant="body2" sx={{ color: "white" }}>
-                  CP 2:{" "}
+                {contactPoints && contactPoints[1] && "cp 2:"}{" "}
                   <span style={{ color: "teal", fontWeight: 800 }}>
                     {contactPoints && contactPoints[1]}
                   </span>
                 </Typography>
                 <Typography variant="body2" sx={{ color: "white" }}>
-                  CP 3:{" "}
+                {contactPoints && contactPoints[2] && "CP 3:"}{" "}
                   <span style={{ color: "teal", fontWeight: 800 }}>
                     {contactPoints && contactPoints[2]}
                   </span>
                 </Typography>
                 <Typography variant="body2" sx={{ color: "white" }}>
-                  CP 4:{" "}
+                {contactPoints && contactPoints[3] && "CP 4"} {" "}
                   <span style={{ color: "teal", fontWeight: 800 }}>
                     {contactPoints && contactPoints[3]}
                   </span>
                 </Typography>
                 <Typography variant="body2" sx={{ color: "white" }}>
-                  CP 5:{" "}
+                {contactPoints && contactPoints[4] && "CP 5:"} 
                   <span style={{ color: "teal", fontWeight: 800 }}>
                     {contactPoints && contactPoints[4]}
                   </span>
                 </Typography>
                 <Typography variant="body2" sx={{ color: "white" }}>
-                  PantoHeight:{" "}
+                  {height && "PantoHeight:"}{" "}
                   <span style={{ color: "teal", fontWeight: 800 }}>
                     {height}
                   </span>
                 </Typography>
               </Box>
-              <Box sx={{ position: "absolute", bottom: 10, left: 10 }}>
+              <Grid container sx={{ position: "absolute", bottom: 10, left: 10 }} justifyContent="space-around">
                 <Typography variant="body2" sx={{ color: "white" }}>
-                 Lat:{" "}
+                 Section:{" "}
                   <span style={{ color: "teal", fontWeight: 800 }}>
-                    {lat}
+                    {formValues.route}
                   </span>
                 </Typography>
                 <Typography variant="body2" sx={{ color: "white" }}>
-                  Long:{" "}
+                  Speed:{" "}
                   <span style={{ color: "teal", fontWeight: 800 }}>
-                    {lang}
+                    00KMH
                   </span>
                 </Typography>
                 <Typography variant="body2" sx={{ color: "white" }}>
-                  Current Location:{" "}
+                  Time:{" "}
                   <span style={{ color: "teal", fontWeight: 800 }}>
-                    {currLocation}
+                    {currentDateTime}
                   </span>
                 </Typography>
                 <Typography variant="body2" sx={{ color: "white" }}>
-                  Previous Location:{" "}
+                   Location:{" "}
                   <span style={{ color: "teal", fontWeight: 800 }}>
-                    {prevLocation}
+                    {prevLocation} (P) {currLocation} (C) {nextLocation} (N)
                   </span>
                 </Typography>
-                <Typography variant="body2" sx={{ color: "white" }}>
-                  Next Location:{" "}
-                  <span style={{ color: "teal", fontWeight: 800 }}>
-                    {nextLocation}
-                  </span>
-                </Typography>
-              </Box>
+               
+              </Grid>
             </Box>
 
             <Divider sx={{ marginY: 2 }} />
@@ -980,7 +992,7 @@ const CameraView = () => {
                 fontWeight={800}
                 sx={{ color: isNightMode ? "#ccc" : "#000", marginTop: 3 }}
               >
-                Last: 00/00 | Current: 00/00 | Next: 00/00
+                Last: {prevLocation} | Current: {currLocation} | Next: {nextLocation}
               </Typography>
               {!videoUrl && (
                 <Button
@@ -1041,7 +1053,7 @@ const CameraView = () => {
               <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                 <LocationOn sx={{ marginRight: 1 }} />
                 <Typography style={{ fontSize: "1vw" }}>
-                  Location: 00
+                  Location: {prevLocation}
                 </Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>

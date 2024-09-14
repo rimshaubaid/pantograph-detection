@@ -2,11 +2,7 @@ import React from 'react';
 import { Container, Grid, TextField, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, IconButton, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
 import { Edit,Delete } from '@mui/icons-material';
 const sections = [
-  { id: 1, route: 'PBE-TPU SL', section: 'PBE-NRY', description: 'None', active: 1 },
-  { id: 2, route: 'PBE-TPU SL', section: 'NRY-MJZ', description: 'None', active: 1 },
-  { id: 3, route: 'PBE-TPU SL', section: 'MJZ-KHMA', description: 'None', active: 1 },
-  { id: 4, route: 'PBE-TPU SL', section: 'KHMA-CKK', description: 'None', active: 1 },
-  { id: 5, route: 'PBE-TPU SL', section: 'CKK-BNSA', description: 'None', active: 1 },
+
   // Add more entries as needed
 ];
 

@@ -4,17 +4,7 @@ import {Edit,Delete} from '@mui/icons-material';
 
 
 const routes = [
-  { id: 1, route: 'PBE-TPU SL', description: 'SL', active: 1 },
-  { id: 2, route: 'TPU-PBE SL', description: 'SL', active: 1 },
-  { id: 3, route: 'MRJ-SNE', description: 'None', active: 1 },
-  { id: 4, route: 'NCB-SRPB UP', description: 'UP', active: 1 },
-  { id: 5, route: 'SRPB-NCB DN', description: 'DN', active: 1 },
-  { id: 6, route: 'PBE-TPU SL-01', description: 'SL', active: 1 },
-  { id: 7, route: 'BLSN-ANMD SL', description: 'None', active: 1 },
-  { id: 8, route: 'PBE-TPU SL-02', description: 'None', active: 1 },
-  { id: 9, route: 'PBE-TPU SL-03', description: 'None', active: 1 },
-  { id: 10, route: 'PBE-TPU SL-04', description: 'None', active: 1 },
-  { id: 11, route: 'All-DET SL', description: 'None', active: 1 },
+
 ];
 
 const RouteManagement = () => {
