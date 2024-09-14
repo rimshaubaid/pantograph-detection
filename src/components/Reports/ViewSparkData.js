@@ -80,11 +80,11 @@ const SparkDataView = () => {
         "Id",
         "Route",
         "Section",
-        "Stagger 1",
-        "Stagger 2",
-        "Stagger 3",
-        "Stagger 4",
-        "Stagger 5",
+        "CP 1",
+        "CP 2",
+        "CP 3",
+        "CP 4",
+        "CP 5",
         "Feature ENG",
         "Feature TRD",
         
@@ -214,11 +214,11 @@ const SparkDataView = () => {
                     <TableCell>Id</TableCell>
                     <TableCell>Route</TableCell>
                     <TableCell>Section</TableCell>
-                    <TableCell>Stagger1</TableCell>
-                    <TableCell>Stagger2</TableCell>
-                    <TableCell>Stagger3</TableCell>
-                    <TableCell>Stagger4</TableCell>
-                    <TableCell>Stagger5</TableCell>
+                    <TableCell>CP1</TableCell>
+                    <TableCell>CP2</TableCell>
+                    <TableCell>CP3</TableCell>
+                    <TableCell>CP4</TableCell>
+                    <TableCell>CP5</TableCell>
                     <TableCell>Feature ENG</TableCell>
                     <TableCell>Feature TRD</TableCell>
                     {/* <TableCell>Frame Number</TableCell>
@@ -334,7 +334,7 @@ const SparkDataView = () => {
     </Grid>
     <Grid item xs={1}>
       <Button onClick={handleDialogOpen} variant="contained" fullWidth>
-      <Typography style={{fontSize:"1vw"}}>Stagger</Typography>
+      <Typography style={{fontSize:"1vw"}}>CP</Typography>
       </Button>
     </Grid>
 
