@@ -175,6 +175,7 @@ const CameraView = () => {
     //if camera isnt selected
     const cam = localStorage.getItem("camera_type");
     const res =  localStorage.getItem("resolution");
+    console.log('ca',cam,res)
     if (!cam) {
       setSelectedCamera(cameras?.[0]?.camera_type);
     } else {

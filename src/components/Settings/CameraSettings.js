@@ -19,13 +19,14 @@ const CameraSettings = () => {
   const [videoStream, setVideoStream] = useState(null);
 
   const [availableResolutions, setAvailableResolutions] = useState([]);
+ 
   // Fetch the list of connected cameras
   useEffect(() => {
     // Fetch the list of connected cameras
     const getCameras = async () => {
       try {
         const response = await axios.get(`${apiUrl}/list-cameras`);
-        const cameras = response.data.cameras;
+    
         setCameras(response.data.cameras);
       } catch (error) {
         console.error("Error accessing media devices.", error);
@@ -34,7 +35,7 @@ const CameraSettings = () => {
 
     getCameras();
   }, []);
-
+ 
   const handleCameraChange = async (event) => {
     const selectedCamera = cameras.find(
       (cam) => cam.camera_type === event.target.value
@@ -76,6 +77,7 @@ const CameraSettings = () => {
   const save = () => {
     localStorage.setItem("resolution", resolution);
     localStorage.setItem("camera_type", camera);
+    alert("Camera settings saved")
   };
 
   return (
@@ -121,9 +123,7 @@ const CameraSettings = () => {
             onChange={handleCameraChange}
             sx={{ color: "#fff", fontWeight: "bold" }}
           >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
+            
             {cameras.map((cam) => (
               <MenuItem key={cam.camera_type} value={cam.camera_type}>
                 {cam.camera_type || `Camera ${cameras.indexOf(cam) + 1}`}
@@ -146,9 +146,7 @@ const CameraSettings = () => {
             onChange={handleResolutionChange}
             sx={{ color: "#fff", fontWeight: "bold" }}
           >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
+            
             <MenuItem value={availableResolutions}>
               {availableResolutions}
             </MenuItem>
