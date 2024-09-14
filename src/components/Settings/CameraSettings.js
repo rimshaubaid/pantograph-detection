@@ -177,8 +177,8 @@ const CameraSettings = () => {
           alignItems: "center",
           justifyContent: "center",
           backgroundColor: "#000",
-          width: "80%",
-          height: "50vh",
+         width: "100%",
+          height: "70vh",
           borderRadius: "4px",
         }}
       >
