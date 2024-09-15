@@ -1,4 +1,4 @@
-import React, { useEffect, useState,useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Box,
   Grid,
@@ -21,9 +21,9 @@ import {
   TableCell,
   TableBody,
 } from "@mui/material";
-import { FFmpeg } from '@ffmpeg/ffmpeg';
+import { FFmpeg } from "@ffmpeg/ffmpeg";
 import axios from "axios";
-import { fetchFile } from '@ffmpeg/util';
+import { fetchFile } from "@ffmpeg/util";
 import {
   Fullscreen,
   FullscreenExit,
@@ -35,16 +35,18 @@ import {
   DirectionsWalk,
   Satellite,
   Explore,
-  Height,LocationOn,Straighten,
+  Height,
+  LocationOn,
+  Straighten,
   FlashOn,
-  VideocamOff,SwapHoriz
+  VideocamOff,
+  SwapHoriz,
 } from "@mui/icons-material";
 
 import { useNavigate } from "react-router-dom";
 
 const apiUrl = process.env.REACT_APP_API_URL;
 const CameraView = () => {
-  
   const navigate = useNavigate();
   const [cameraError, setCameraError] = useState(null);
   const [currentDateTime, setCurrentDateTime] = useState("");
@@ -52,20 +54,21 @@ const CameraView = () => {
   const [isGPS, setIsGPS] = useState(true);
   const [isVideoProcessing, setIsVideoProcessing] = useState(false);
   const [videoUrl, setVideoUrl] = useState(null);
-  const [lang,setLang] = useState(0);
-  const [lat,setLat] = useState(0);
+  const [lang, setLang] = useState(0);
+  const [lat, setLat] = useState(0);
+  const [gpsPort, setGpsPort] = useState("");
   const [openModal, setOpenModal] = useState(true);
   const [ffmpegLoaded, setFfmpegLoaded] = useState(false);
-  const [prevLocation,setPrevLocation] = useState("");
-  const [currLocation,setCurrLocation] = useState("");
-  const [nextLocation,setNextLocation] = useState("");
+  const [prevLocation, setPrevLocation] = useState("");
+  const [currLocation, setCurrLocation] = useState("");
+  const [nextLocation, setNextLocation] = useState("");
   const ffmpeg = useRef(new FFmpeg()).current;
   const [formValues, setFormValues] = useState({
     trainNo: "", // Added trainNo for the Train/Loco No text field
     route: "",
     line: "", // Added line for the Line dropdown
     crew: "",
-    pantographHeight:"",
+    pantographHeight: "",
     associatingStaff: "",
     pantographModel: "",
     typeOfOHE: "",
@@ -87,33 +90,29 @@ const CameraView = () => {
   const [openResumeDialog, setOpenResumeDialog] = useState(false);
   const [openNavigateDialog, setOpenNavigateDialog] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
-  const [cameras,setCameras] = useState([]);
-  const [selectedCamera,setSelectedCamera] = useState(null);
-  const [selectedResolution,setSelectedResolution] = useState(null);
- // const [loading,setLoading] = useState()
+  const [cameras, setCameras] = useState([]);
+  const [selectedCamera, setSelectedCamera] = useState(null);
+  const [selectedResolution, setSelectedResolution] = useState(null);
+  // const [loading,setLoading] = useState()
   const [frames, setFrames] = useState([]);
-  const [contactPoints,setContactPoints] = useState(null);
-  const [height,setHeight] = useState(null);
-  const [routeData,setRouteData] = useState([]);
-  
+  const [contactPoints, setContactPoints] = useState(null);
+  const [height, setHeight] = useState(null);
+  const [routeData, setRouteData] = useState([]);
+
   useEffect(() => {
     getRouteData();
-  },[])
+  }, []);
   const getRouteData = async () => {
     try {
-      const response = await axios.get(
-        `${apiUrl}/fetch-route-data`
-      );
+      const response = await axios.get(`${apiUrl}/fetch-route-data`);
       const data = response?.data?.data;
 
       // Extract only the Route names
-      const routes = data.map(item => item.Route);
+      const routes = data.map((item) => item.Route);
 
       // Set state with Route names
       setRouteData(routes);
-    } catch (err) {
-
-    }
+    } catch (err) {}
   };
   useEffect(() => {
     const timer = setInterval(() => {
@@ -125,7 +124,7 @@ const CameraView = () => {
         hour: "2-digit",
         minute: "2-digit",
         second: "2-digit",
-        hour12: false, 
+        hour12: false,
       });
       setCurrentDateTime(formattedDateTime);
     }, 1000); // Update every second
@@ -157,11 +156,9 @@ const CameraView = () => {
           current_route: formValues.route,
         };
 
-         await axios.post(`${apiUrl}/set-route`, {
+        await axios.post(`${apiUrl}/set-route`, {
           routeData, // Sending the route in the request body
         });
-
-      
 
         setOpenModal(false);
       } catch (error) {
@@ -174,35 +171,64 @@ const CameraView = () => {
   useEffect(() => {
     //if camera isnt selected
     const cam = localStorage.getItem("camera_type");
-    const res =  localStorage.getItem("resolution");
-    console.log('ca',cam,res)
+    const res = localStorage.getItem("resolution");
+
     if (!cam) {
       setSelectedCamera(cameras?.[0]?.camera_type);
     } else {
       setSelectedCamera(cam);
     }
-    if(res){
-      setSelectedResolution(res)
+    if (res) {
+      setSelectedResolution(res);
     } else {
       setSelectedResolution(cameras?.[0]?.resolution);
     }
   }, []);
-
- //console.log('s',selectedCamera,selectedResolution)
 
   useEffect(() => {
     // Fetch the list of connected cameras
     const getCameras = async () => {
       try {
         const response = await axios.get(`${apiUrl}/list-cameras`);
-        setCameras(response.data.cameras)
+        setCameras(response.data.cameras);
       } catch (error) {
-        console.error('Error accessing media devices.', error);
+        console.error("Error accessing media devices.", error);
       }
     };
 
     getCameras();
   }, []);
+
+  useEffect(() => {
+    const gps = localStorage.getItem("gps_port");
+    if (!gps) {
+      getGPSDevices();
+    } else {
+      setGpsPort(gps);
+    }
+  }, []);
+
+  const getGPSDevices = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}/list-gps-devices`);
+      setGpsPort(response.data?.GPS_Devices[0]?.name);
+    } catch (err) {}
+  };
+  useEffect(() => {
+    if (isGPS && gpsPort) {
+      connectGPS();
+    }
+  }, [isGPS,gpsPort]);
+  const connectGPS = async () => {
+    try {
+      const requestBody = { serial_port: gpsPort };
+
+      await axios.post(`${apiUrl}/connect_gps`, requestBody);
+    } catch (err) {
+      alert(err?.response?.data?.error);
+    }
+  };
+
   useEffect(() => {
     if (!formValues?.route) {
       return; // Do not proceed if formValues.route doesn't exist
@@ -240,14 +266,11 @@ const CameraView = () => {
     };
   }, [handleSubmit]);
 
- 
-
   useEffect(() => {
     if (currentFrame && frameRef.current) {
       frameRef.current.src = `data:image/jpeg;base64,${currentFrame}`;
     }
   }, [currentFrame]);
-
 
   const saveVideo = async () => {
     if (!ffmpegLoaded) {
@@ -255,24 +278,35 @@ const CameraView = () => {
     }
 
     setIsVideoProcessing(true);
- 
+
     // Save each frame as an image file in FFmpeg's virtual file system
     for (let i = 0; i < frames.length; i++) {
       const frame = frames[i];
-      
-      await ffmpeg.writeFile(`frame${i}.jpg`, await fetchFile(`data:image/jpeg;base64,${frame}`));
+
+      await ffmpeg.writeFile(
+        `frame${i}.jpg`,
+        await fetchFile(`data:image/jpeg;base64,${frame}`)
+      );
     }
 
     // Create a video from the frames using FFmpeg
-    await ffmpeg.exec(
-      ['-framerate', '24', '-i', 'frame%d.jpg', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', 'output.mp4']
-    );
+    await ffmpeg.exec([
+      "-framerate",
+      "24",
+      "-i",
+      "frame%d.jpg",
+      "-c:v",
+      "libx264",
+      "-pix_fmt",
+      "yuv420p",
+      "output.mp4",
+    ]);
 
-    const data = await ffmpeg.readFile('output.mp4');
+    const data = await ffmpeg.readFile("output.mp4");
 
     // Generate a blob URL for the video file
     const videoBlobUrl = URL.createObjectURL(
-      new Blob([data.buffer], { type: 'video/mp4' })
+      new Blob([data.buffer], { type: "video/mp4" })
     );
     setVideoUrl(videoBlobUrl);
 
@@ -337,7 +371,6 @@ const CameraView = () => {
 
   const handlePauseRecording = () => {
     setOpenPauseDialog(true);
-  
   };
 
   const handleResumeRecording = () => {
@@ -367,7 +400,7 @@ const CameraView = () => {
       [name]: value,
     }));
   };
-  
+
   // const captureFrame = async () => {
   //   if (videoRef.current && canvasRef.current) {
   //     const canvas = canvasRef.current;
@@ -382,7 +415,7 @@ const CameraView = () => {
 
   //     // Remove the prefix from base64 string
   //     const base64Data = base64Image.replace(/^data:image\/jpeg;base64,/, "");
-  
+
   //     // // Send base64 frame to backend
   //     try {
   //       const response = await fetch(
@@ -395,7 +428,7 @@ const CameraView = () => {
   //           // body: JSON.stringify({ frame: base64Data }), // Serialize the body
   //         }
   //       );
-       
+
   //       if (!response.body) {
   //         throw new Error(
   //           "ReadableStream not supported or no body in response"
@@ -403,15 +436,15 @@ const CameraView = () => {
   //       }
 
   //       const reader = response.body.getReader();
-      
+
   //       const decoder = new TextDecoder();
   //       let buffer = "";
-   
+
   //       // Process the stream
   //       while (true) {
   //         const { done, value } = await reader.read();
   //         if (done) break;
- 
+
   //         buffer += decoder.decode(value, { stream: true });
   //         // console.log('buffer',buffer)
   //         // Split buffer by newlines to get frames
@@ -445,10 +478,9 @@ const CameraView = () => {
   //   if(!isPaused){
   //     intervalId = setInterval(captureFrame, 1000); // Capture frame every 1 second
   //   }
-  
+
   //   return () => clearInterval(intervalId);
   // }, [isPaused,isRecording]);
-  
 
   // useEffect(() => {
   //   const startVideo = async () => {
@@ -479,31 +511,27 @@ const CameraView = () => {
   //   };
   // }, []);
 
-  
   const validateForm = () => {
     const errors = {};
 
     if (!formValues.trainNo) {
-      errors.trainNo = 'This field is required';
+      errors.trainNo = "This field is required";
     }
     if (!formValues.route) {
-      errors.route = 'This field is required';
+      errors.route = "This field is required";
     }
     if (!formValues.line) {
-      errors.line = 'This field is required';
+      errors.line = "This field is required";
     }
     if (!formValues.associatingStaff) {
-      errors.associatingStaff = 'This field is required';
+      errors.associatingStaff = "This field is required";
     }
     if (!formValues.pantographModel) {
-      errors.pantographModel = 'This field is required';
+      errors.pantographModel = "This field is required";
     }
 
     return errors;
   };
-
- 
-
 
   return (
     <Box
@@ -529,17 +557,17 @@ const CameraView = () => {
         <DialogTitle>Select</DialogTitle>
         <DialogContent>
           <Grid container justifyContent="center">
-          <TextField
-                label="Pantograph Height"
-                name="pantographHeight"
-                fullWidth
-                margin="normal"
-                value={formValues.pantographHeight}
-                onChange={handleChange}
-                required
-                error={hasSubmitted && !!formErrors.pantographHeight}
-                helperText={hasSubmitted && formErrors.pantographHeight}
-              />
+            <TextField
+              label="Pantograph Height"
+              name="pantographHeight"
+              fullWidth
+              margin="normal"
+              value={formValues.pantographHeight}
+              onChange={handleChange}
+              required
+              error={hasSubmitted && !!formErrors.pantographHeight}
+              helperText={hasSubmitted && formErrors.pantographHeight}
+            />
           </Grid>
           {/* Train/Loco No TextField */}
 
@@ -571,11 +599,12 @@ const CameraView = () => {
                 error={hasSubmitted && !!formErrors.route}
                 helperText={hasSubmitted && formErrors.route}
               >
-                {routeData && routeData.map((route, index) => (
-                  <MenuItem key={index} value={route}>
-                    {route}
-                  </MenuItem>
-                ))}
+                {routeData &&
+                  routeData.map((route, index) => (
+                    <MenuItem key={index} value={route}>
+                      {route}
+                    </MenuItem>
+                  ))}
                 {/* Add more routes as needed */}
               </TextField>
             </Grid>
@@ -623,7 +652,7 @@ const CameraView = () => {
               />
             </Grid>
             <Grid item xs={12} md={5.5}>
-            <TextField
+              <TextField
                 label="Pantograph Model"
                 name="pantographModel"
                 fullWidth
@@ -638,8 +667,7 @@ const CameraView = () => {
           </Grid>
           <Grid container justifyContent="space-between">
             <Grid item xs={12} md={5.5}>
-            
-            <TextField
+              <TextField
                 label="Type of OHE"
                 name="typeOfOHE"
                 fullWidth
@@ -649,7 +677,7 @@ const CameraView = () => {
               />
             </Grid>
             <Grid item xs={12} md={5.5}>
-            <TextField
+              <TextField
                 label="Sag"
                 name="sag"
                 fullWidth
@@ -661,8 +689,7 @@ const CameraView = () => {
           </Grid>
           <Grid container justifyContent="space-between">
             <Grid item xs={12} md={5.5}>
-           
-            <TextField
+              <TextField
                 label="Tension in wire"
                 name="tensionInWire"
                 fullWidth
@@ -672,8 +699,7 @@ const CameraView = () => {
               />
             </Grid>
             <Grid item xs={12} md={5.5}>
-            
-            <TextField
+              <TextField
                 select
                 label="Weather condition"
                 name="weather"
@@ -690,22 +716,20 @@ const CameraView = () => {
               </TextField>
             </Grid>
             <Grid container justifyContent="space-between">
-              <Grid item xs={12} md={5.5}> 
-             </Grid>
+              <Grid item xs={12} md={5.5}></Grid>
               {formValues.weather === "Temp" && (
-              <Grid item xs={12} md={5.5}>
-                <TextField
-                  label="Temperature"
-                  name="temperature"
-                  fullWidth
-                  margin="normal"
-                  value={formValues.temperature}
-                  onChange={handleChange}
-                />
-              </Grid>
-            )}
+                <Grid item xs={12} md={5.5}>
+                  <TextField
+                    label="Temperature"
+                    name="temperature"
+                    fullWidth
+                    margin="normal"
+                    value={formValues.temperature}
+                    onChange={handleChange}
+                  />
+                </Grid>
+              )}
             </Grid>
-           
           </Grid>
         </DialogContent>
         <DialogActions>
@@ -806,7 +830,9 @@ const CameraView = () => {
             </Typography>
           </Grid>
           <Grid item xs={2}>
-            <Typography style={{ fontSize: "1vw" }}>Time: {currentDateTime}</Typography>
+            <Typography style={{ fontSize: "1vw" }}>
+              Time: {currentDateTime}
+            </Typography>
           </Grid>
         </Grid>
 
@@ -859,32 +885,32 @@ const CameraView = () => {
               </Box>
               <Box sx={{ position: "absolute", top: 10, left: 10 }}>
                 <Typography variant="body2" sx={{ color: "white" }}>
-                {contactPoints && contactPoints[0] && "CP 1:"} 
+                  {contactPoints && contactPoints[0] && "CP 1:"}
                   <span style={{ color: "teal", fontWeight: 800 }}>
                     {contactPoints && contactPoints[0]}
                   </span>
                 </Typography>
-               
+
                 <Typography variant="body2" sx={{ color: "white" }}>
-                {contactPoints && contactPoints[1] && "cp 2:"}{" "}
+                  {contactPoints && contactPoints[1] && "cp 2:"}{" "}
                   <span style={{ color: "teal", fontWeight: 800 }}>
                     {contactPoints && contactPoints[1]}
                   </span>
                 </Typography>
                 <Typography variant="body2" sx={{ color: "white" }}>
-                {contactPoints && contactPoints[2] && "CP 3:"}{" "}
+                  {contactPoints && contactPoints[2] && "CP 3:"}{" "}
                   <span style={{ color: "teal", fontWeight: 800 }}>
                     {contactPoints && contactPoints[2]}
                   </span>
                 </Typography>
                 <Typography variant="body2" sx={{ color: "white" }}>
-                {contactPoints && contactPoints[3] && "CP 4"} {" "}
+                  {contactPoints && contactPoints[3] && "CP 4"}{" "}
                   <span style={{ color: "teal", fontWeight: 800 }}>
                     {contactPoints && contactPoints[3]}
                   </span>
                 </Typography>
                 <Typography variant="body2" sx={{ color: "white" }}>
-                {contactPoints && contactPoints[4] && "CP 5:"} 
+                  {contactPoints && contactPoints[4] && "CP 5:"}
                   <span style={{ color: "teal", fontWeight: 800 }}>
                     {contactPoints && contactPoints[4]}
                   </span>
@@ -896,18 +922,20 @@ const CameraView = () => {
                   </span>
                 </Typography>
               </Box>
-              <Grid container sx={{ position: "absolute", bottom: 10, left: 10 }} justifyContent="space-around">
+              <Grid
+                container
+                sx={{ position: "absolute", bottom: 10, left: 10 }}
+                justifyContent="space-around"
+              >
                 <Typography variant="body2" sx={{ color: "white" }}>
-                 Section:{" "}
+                  Section:{" "}
                   <span style={{ color: "teal", fontWeight: 800 }}>
                     {formValues.route}
                   </span>
                 </Typography>
                 <Typography variant="body2" sx={{ color: "white" }}>
                   Speed:{" "}
-                  <span style={{ color: "teal", fontWeight: 800 }}>
-                    00KMH
-                  </span>
+                  <span style={{ color: "teal", fontWeight: 800 }}>00KMH</span>
                 </Typography>
                 <Typography variant="body2" sx={{ color: "white" }}>
                   Time:{" "}
@@ -916,12 +944,11 @@ const CameraView = () => {
                   </span>
                 </Typography>
                 <Typography variant="body2" sx={{ color: "white" }}>
-                   Location:{" "}
+                  Location:{" "}
                   <span style={{ color: "teal", fontWeight: 800 }}>
                     {prevLocation} (P) {currLocation} (C) {nextLocation} (N)
                   </span>
                 </Typography>
-               
               </Grid>
             </Box>
 
@@ -964,7 +991,8 @@ const CameraView = () => {
                 fontWeight={800}
                 sx={{ color: isNightMode ? "#ccc" : "#000", marginTop: 3 }}
               >
-                Last: {prevLocation} | Current: {currLocation} | Next: {nextLocation}
+                Last: {prevLocation} | Current: {currLocation} | Next:{" "}
+                {nextLocation}
               </Typography>
               {!videoUrl && (
                 <Button
@@ -1036,23 +1064,33 @@ const CameraView = () => {
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                 <Straighten sx={{ marginRight: 1 }} />
-                <Typography style={{ fontSize: "1vw" }}>CP 1: {contactPoints && (contactPoints?.[0] || "-")}</Typography>
+                <Typography style={{ fontSize: "1vw" }}>
+                  CP 1: {contactPoints && (contactPoints?.[0] || "-")}
+                </Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                 <Straighten sx={{ marginRight: 1 }} />
-                <Typography style={{ fontSize: "1vw" }}>CP 2: {contactPoints && (contactPoints?.[1] || "-")}</Typography>
+                <Typography style={{ fontSize: "1vw" }}>
+                  CP 2: {contactPoints && (contactPoints?.[1] || "-")}
+                </Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                 <Straighten sx={{ marginRight: 1 }} />
-                <Typography style={{ fontSize: "1vw" }}>CP 3: {contactPoints && (contactPoints?.[2] || "-")}</Typography>
+                <Typography style={{ fontSize: "1vw" }}>
+                  CP 3: {contactPoints && (contactPoints?.[2] || "-")}
+                </Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                 <Straighten sx={{ marginRight: 1 }} />
-                <Typography style={{ fontSize: "1vw" }}>CP 4: {contactPoints && (contactPoints?.[3] || "-")}</Typography>
+                <Typography style={{ fontSize: "1vw" }}>
+                  CP 4: {contactPoints && (contactPoints?.[3] || "-")}
+                </Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                 <Straighten sx={{ marginRight: 1 }} />
-                <Typography style={{ fontSize: "1vw" }}>CP 5: {contactPoints && (contactPoints?.[4] || "-")}</Typography>
+                <Typography style={{ fontSize: "1vw" }}>
+                  CP 5: {contactPoints && (contactPoints?.[4] || "-")}
+                </Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                 <SwapHoriz sx={{ marginRight: 1 }} />
