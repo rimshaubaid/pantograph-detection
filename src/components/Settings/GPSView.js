@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -8,16 +8,31 @@ import {
   Select,
   TextField,
   Typography,
-  Checkbox
+  Checkbox,
 } from "@mui/material";
-
+import axios from "axios";
+const apiUrl = process.env.REACT_APP_API_URL;
 const GPSSettings = () => {
-  const [gpsPort, setGpsPort] = React.useState("");
-  const [baudRate, setBaudRate] = React.useState("9600");
-  const [dataBit, setDataBit] = React.useState("8");
-  const [stopBit, setStopBit] = React.useState("0");
-  const [parityBit, setParityBit] = React.useState("1");
-  const [isChecked, setIsChecked] = React.useState(true);
+  const [gpsPort, setGpsPort] = useState("");
+  const [baudRate, setBaudRate] = useState("9600");
+  const [dataBit, setDataBit] = useState("8");
+  const [stopBit, setStopBit] = useState("0");
+  const [parityBit, setParityBit] = useState("1");
+  const [isChecked, setIsChecked] = useState(true);
+  const [availablePorts, setAvailablePorts] = useState([]);
+  
+  useEffect(() => {
+    getDevices();
+  }, []);
+
+  const getDevices = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}/list-gps-devices`);
+      setAvailablePorts(response.data.GPS_Devices);
+    } catch (err) {}
+  };
+
+ 
   const handleGpsPortChange = (event) => {
     setGpsPort(event.target.value);
   };
@@ -42,15 +57,35 @@ const GPSSettings = () => {
     setIsChecked(event.target.checked);
   };
 
+
+  const handleSaveSettings = () => {
+    localStorage.setItem("gps_port",gpsPort);
+    alert("GPS settings saved")
+    // You can handle saving the GPS settings here (e.g., send them to the backend or apply them)
+    console.log({
+      gpsPort,
+      baudRate,
+      dataBit,
+      stopBit,
+      parityBit,
+    });
+  };
+
   return (
-    <Box sx={{ width: "100%", backgroundColor: "#333", height:"100vh",paddingTop:10}}>
+    <Box
+      sx={{
+        width: "100%",
+        backgroundColor: "#333",
+        height: "100vh",
+        paddingTop: 10,
+      }}
+    >
       <Box
         sx={{
           width: "100%",
           maxWidth: "400px",
           margin: "auto",
           padding: "20px",
-
           color: "#fff",
           borderRadius: "4px",
         }}
@@ -60,17 +95,23 @@ const GPSSettings = () => {
             checked={isChecked}
             onChange={handleCheckboxChange}
             sx={{
-              color: '#00E5FF',
+              color: "#00E5FF",
               marginRight: 1,
-              '&.Mui-checked': {
-                color: '#00E5FF',
+              "&.Mui-checked": {
+                color: "#00E5FF",
               },
             }}
           />
-          <Typography variant="h4" sx={{ textAlign: "center", flexGrow: 1,fontWeight: 'bold', }} color="#00E5FF">
+          <Typography
+            variant="h4"
+            sx={{ textAlign: "center", flexGrow: 1, fontWeight: "bold" }}
+            color="#00E5FF"
+          >
             GPS Settings
           </Typography>
         </Box>
+
+        {/* GPS Port Select */}
         <FormControl fullWidth sx={{ marginBottom: 2 }}>
           <InputLabel id="gps-port-select-label" sx={{ color: "#fff" }}>
             GPS Com Port
@@ -79,17 +120,19 @@ const GPSSettings = () => {
             labelId="gps-port-select-label"
             id="gps-port-select"
             value={gpsPort}
+        
             label="GPS Com Port"
             onChange={handleGpsPortChange}
           >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
-            <MenuItem value={10}>COM1</MenuItem>
-            <MenuItem value={20}>COM2</MenuItem>
-            <MenuItem value={30}>COM3</MenuItem>
+            
+            {availablePorts.map((port, index) => (
+              <MenuItem key={index} value={port.name}>
+                {port.name}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
+        {/* Form Fields for GPS Settings */}
         <TextField
           label="Baud Rate"
           type="number"
@@ -122,8 +165,14 @@ const GPSSettings = () => {
           onChange={handleParityBitChange}
           sx={{ marginBottom: 4 }}
         />
-        <Button variant="contained" color="primary" fullWidth sx={{background:"#00E5FF",color:"black",fontWeight:"800"}}>
-          Save GPS Setting
+
+        <Button
+          variant="contained"
+          fullWidth
+          sx={{ background: "#00E5FF", color: "black", fontWeight: "800" }}
+          onClick={handleSaveSettings}
+        >
+          Save GPS Settings
         </Button>
       </Box>
     </Box>
