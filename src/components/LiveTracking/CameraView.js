@@ -167,37 +167,50 @@ const CameraView = () => {
       }
     }
   };
+  // Fetch the list of connected cameras
+  useEffect(() => {
+    const getCameras = async () => {
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = devices.filter((device) => device.kind === "videoinput");
+        setCameras(videoDevices);
+      } catch (error) {
+        console.error("Error fetching camera devices.", error);
+      }
+    };
+    getCameras();
+  }, []);
 
   useEffect(() => {
     //if camera isnt selected
     const cam = localStorage.getItem("camera_type");
     const res = localStorage.getItem("resolution");
-
+    console.log('cam',cam,res);
     if (!cam) {
-      setSelectedCamera(cameras?.[0]?.camera_type);
+      setSelectedCamera(cameras?.[0]?.deviceId);
     } else {
       setSelectedCamera(cam);
     }
     if (res) {
       setSelectedResolution(res);
     } else {
-      setSelectedResolution(cameras?.[0]?.resolution);
+      setSelectedResolution("640x480");
     }
   }, []);
 
-  useEffect(() => {
-    // Fetch the list of connected cameras
-    const getCameras = async () => {
-      try {
-        const response = await axios.get(`${apiUrl}/list-cameras`);
-        setCameras(response.data.cameras);
-      } catch (error) {
-        console.error("Error accessing media devices.", error);
-      }
-    };
+  // useEffect(() => {
+  //   // Fetch the list of connected cameras
+  //   const getCameras = async () => {
+  //     try {
+  //       const response = await axios.get(`${apiUrl}/list-cameras`);
+  //       setCameras(response.data.cameras);
+  //     } catch (error) {
+  //       console.error("Error accessing media devices.", error);
+  //     }
+  //   };
 
-    getCameras();
-  }, []);
+  //   getCameras();
+  // }, []);
 
   useEffect(() => {
     const gps = localStorage.getItem("gps_port");
@@ -228,14 +241,14 @@ const CameraView = () => {
       alert(err?.response?.data?.error);
     }
   };
-
+  
   useEffect(() => {
     if (!formValues?.route) {
       return; // Do not proceed if formValues.route doesn't exist
     }
 
     const eventSource = new EventSource(
-      `${apiUrl}/process-camera-feed?camera_type=${selectedCamera}&resolution=${selectedResolution}&route=${formValues?.route}`
+      `${apiUrl}/process-camera-feed?device_id=${selectedCamera}&resolution=${selectedResolution}&route=${formValues?.route}`
     );
 
     eventSource.onmessage = (event) => {
