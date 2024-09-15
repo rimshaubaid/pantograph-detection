@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import { FFmpeg } from '@ffmpeg/ffmpeg';
-import { fetchFile } from '@ffmpeg/util';
-import { Box, Button, Typography } from "@mui/material";
+import { FFmpeg } from "@ffmpeg/ffmpeg";
+import { fetchFile } from "@ffmpeg/util";
+import { Box, Button, CircularProgress, Grid, Typography } from "@mui/material";
 const apiUrl = process.env.REACT_APP_API_URL;
 const VideoUploadAndStream = () => {
   const [videoFile, setVideoFile] = useState(null);
@@ -82,19 +82,30 @@ const VideoUploadAndStream = () => {
     // Save each frame as an image file in FFmpeg's virtual file system
     for (let i = 0; i < frames.length; i++) {
       const frame = frames[i];
-      await ffmpeg.writeFile(`frame${i}.jpg`, await fetchFile(`data:image/jpeg;base64,${frame}`));
+      await ffmpeg.writeFile(
+        `frame${i}.jpg`,
+        await fetchFile(`data:image/jpeg;base64,${frame}`)
+      );
     }
 
     // Create a video from the frames using FFmpeg
-    await ffmpeg.exec(
-      ['-framerate', '24', '-i', 'frame%d.jpg', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', 'output.mp4']
-    );
+    await ffmpeg.exec([
+      "-framerate",
+      "24",
+      "-i",
+      "frame%d.jpg",
+      "-c:v",
+      "libx264",
+      "-pix_fmt",
+      "yuv420p",
+      "output.mp4",
+    ]);
 
-    const data = await ffmpeg.readFile('output.mp4');
+    const data = await ffmpeg.readFile("output.mp4");
 
     // Generate a blob URL for the video file
     const videoBlobUrl = URL.createObjectURL(
-      new Blob([data.buffer], { type: 'video/mp4' })
+      new Blob([data.buffer], { type: "video/mp4" })
     );
     setVideoUrl(videoBlobUrl);
 
@@ -127,34 +138,40 @@ const VideoUploadAndStream = () => {
   return (
     <Box sx={{ paddingTop: 10, paddingX: 5 }}>
       <Typography variant="h1">Process Video</Typography>
+      <Grid container >
+        <Grid item xs={3}>
+          <input type="file" accept="video/*" onChange={handleVideoUpload} />
+        </Grid>
 
-      <input type="file" accept="video/*" onChange={handleVideoUpload} />
-
-      {isVideoProcessing && frames?.length < 0 && (
-        <p>Processing video, please wait...</p>
-      )}
-      {frames.length > 0 && (
-        <Box marginY={1}>
-          <Button
-            variant="outlined"
-            onClick={saveVideo}
-            disabled={isVideoProcessing}
-          >
-            Save Video
-          </Button>
-          <Button variant="outlined" onClick={togglePause}>
-            {isPaused ? "Resume" : "Pause"}
-          </Button>
-        </Box>
-      )}
-
-      {videoUrl && (
-        <a href={videoUrl} download="processed_video.mp4">
-          <Button variant="contained" color="primary">
-            Download Video
-          </Button>
-        </a>
-      )}
+        <Grid item xs={5}>
+          {frames.length > 0 && (
+            <Box marginY={1}>
+             
+               <Button variant="outlined" onClick={togglePause} sx={{marginRight:3}}>
+                {isPaused ? "Resume" : "Pause"}
+              </Button>
+             {!isVideoProcessing  && <Button
+                variant="outlined"
+                onClick={saveVideo}
+                disabled={isVideoProcessing}
+              >
+                Save Video
+              </Button>}
+              {isVideoProcessing && frames?.length < 0 && (
+                <CircularProgress />
+              )}
+              {videoUrl && (
+            <a href={videoUrl} download="processed_video.mp4">
+              <Button variant="contained" color="primary" sx={{marginLeft:3}}>
+                Download Video
+              </Button>
+            </a>
+          )}
+            </Box>
+          )}
+        </Grid>
+      
+      </Grid>
 
       {frames.length > 0 && (
         <img
