@@ -11,8 +11,11 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  Dialog,
+  DialogContent,
+  DialogTitle
 } from "@mui/material";
-
+import CameraAdvancedSettings from "./AdvancedSettings.js";
 import { VideocamOff , ExpandMore } from "@mui/icons-material";
 
 const CameraSettings = () => {
@@ -21,12 +24,22 @@ const CameraSettings = () => {
   const [resolution, setResolution] = useState("");
   const [availableResolutions, setAvailableResolutions] = useState([]);
   const [videoStream, setVideoStream] = useState(null);
+  const [openSettingsDialog, setOpenSettingsDialog] = useState(false);
   const [settings, setSettings] = useState({
     brightness: 100,
     contrast: 100,
     saturation: 100,
   });
 
+  // Function to handle opening the advanced settings dialog
+  const handleOpenSettingsDialog = () => {
+    setOpenSettingsDialog(true);
+  };
+
+  // Function to handle closing the advanced settings dialog
+  const handleCloseSettingsDialog = () => {
+    setOpenSettingsDialog(false);
+  };
   // Fetch the list of connected cameras
   useEffect(() => {
     const getCameras = async () => {
@@ -199,6 +212,9 @@ const CameraSettings = () => {
             ))}
           </Select>
         </FormControl>
+        <Button variant="contained" onClick={handleOpenSettingsDialog} sx={{marginRight:3}}>
+        Advanced Settings
+      </Button>
         <Button
           variant="contained"
           color="secondary"
@@ -208,7 +224,7 @@ const CameraSettings = () => {
           Save Camera Setting
         </Button>
       </Box>
-
+      
       {/* Advanced Settings Accordion */}
       {/* <Accordion sx={{ width: "80%", marginBottom: 4 }}>
         <AccordionSummary
@@ -313,6 +329,14 @@ const CameraSettings = () => {
           </Box>
         )}
       </Box>
+       {/* Dialog for Advanced Settings */}
+       <Dialog open={openSettingsDialog} onClose={handleCloseSettingsDialog} maxWidth="md" fullWidth>
+        <DialogTitle>Advanced Camera Settings</DialogTitle>
+        <DialogContent>
+          {/* Pass the videoStream to the CameraAdvancedSettings component */}
+          <CameraAdvancedSettings videoStream={videoStream} />
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 };
