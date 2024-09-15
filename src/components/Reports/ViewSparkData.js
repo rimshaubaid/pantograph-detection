@@ -221,11 +221,7 @@ const SparkDataView = () => {
                     <TableCell>CP5</TableCell>
                     <TableCell>Feature ENG</TableCell>
                     <TableCell>Feature TRD</TableCell>
-                    {/* <TableCell>Frame Number</TableCell>
-                    <TableCell>Height</TableCell>
-                    <TableCell>Imp</TableCell>
-                    <TableCell>Inclination</TableCell>
-                    <TableCell>PantoHeight</TableCell> */}
+                  
                    
 
                   </TableRow>
@@ -246,11 +242,7 @@ const SparkDataView = () => {
                         <TableCell>{item.cp5 || "-"}</TableCell>
                         <TableCell>{item.feature_eng}</TableCell>
                         <TableCell>{item.feature_trd}</TableCell>
-                        {/* <TableCell>{item.frame_number}</TableCell>
-                        <TableCell>{item.height}</TableCell>
-                        <TableCell>{item.imp}</TableCell>
-                        <TableCell>{item.inclination}</TableCell>
-                        <TableCell>{item.pantograph_height}</TableCell> */}
+                       
                         
                    
                       </TableRow>

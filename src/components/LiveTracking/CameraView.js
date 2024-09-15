@@ -183,11 +183,11 @@ const CameraView = () => {
 
   useEffect(() => {
     //if camera isnt selected
-    const cam = localStorage.getItem("camera_type");
+    const cam = localStorage.getItem("deviceId");
     const res = localStorage.getItem("resolution");
-    console.log('cam',cam,res);
+   
     if (!cam) {
-      setSelectedCamera(cameras?.[0]?.deviceId);
+      setSelectedCamera("camera0");
     } else {
       setSelectedCamera(cam);
     }
@@ -839,7 +839,7 @@ const CameraView = () => {
           </Grid>
           <Grid item xs={2}>
             <Typography style={{ fontSize: "1vw" }}>
-              Recording: {isRecording ? "ON" : "OFF"}
+              Recording: {isPaused ? "OFF" : "ON"}
             </Typography>
           </Grid>
           <Grid item xs={2}>
@@ -896,40 +896,40 @@ const CameraView = () => {
                   {isFullScreen ? <FullscreenExit /> : <Fullscreen />}
                 </IconButton>
               </Box>
-              <Box sx={{ position: "absolute", top: 10, left: 10 }}>
+              <Box sx={{ position: "absolute", top: 10, left: 10 , display:"flex" }}>
                 <Typography variant="body2" sx={{ color: "white" }}>
-                  {contactPoints && contactPoints[0] && "CP 1:"}
+                  CP 1:{" "}
                   <span style={{ color: "teal", fontWeight: 800 }}>
                     {contactPoints && contactPoints[0]}
                   </span>
                 </Typography>
 
-                <Typography variant="body2" sx={{ color: "white" }}>
-                  {contactPoints && contactPoints[1] && "cp 2:"}{" "}
+                <Typography variant="body2" sx={{ color: "white",marginLeft:2 }}>
+                  CP 2:{" "}
                   <span style={{ color: "teal", fontWeight: 800 }}>
                     {contactPoints && contactPoints[1]}
                   </span>
                 </Typography>
-                <Typography variant="body2" sx={{ color: "white" }}>
-                  {contactPoints && contactPoints[2] && "CP 3:"}{" "}
+                <Typography variant="body2" sx={{ color: "white",marginLeft:2  }}>
+                  CP 3: {" "}
                   <span style={{ color: "teal", fontWeight: 800 }}>
                     {contactPoints && contactPoints[2]}
                   </span>
                 </Typography>
-                <Typography variant="body2" sx={{ color: "white" }}>
-                  {contactPoints && contactPoints[3] && "CP 4"}{" "}
+                <Typography variant="body2" sx={{ color: "white",marginLeft:2  }}>
+                 CP 4:
                   <span style={{ color: "teal", fontWeight: 800 }}>
                     {contactPoints && contactPoints[3]}
                   </span>
                 </Typography>
-                <Typography variant="body2" sx={{ color: "white" }}>
-                  {contactPoints && contactPoints[4] && "CP 5:"}
+                <Typography variant="body2" sx={{ color: "white",marginLeft:2  }}>
+                  CP 5:
                   <span style={{ color: "teal", fontWeight: 800 }}>
                     {contactPoints && contactPoints[4]}
                   </span>
                 </Typography>
-                <Typography variant="body2" sx={{ color: "white" }}>
-                  {height && "PantoHeight:"}{" "}
+                <Typography variant="body2" sx={{ color: "white",marginLeft:2  }}>
+                  PantoHeight:{" "}
                   <span style={{ color: "teal", fontWeight: 800 }}>
                     {height}
                   </span>
@@ -940,7 +940,7 @@ const CameraView = () => {
                 sx={{ position: "absolute", bottom: 10, left: 10 }}
                 justifyContent="space-around"
               >
-                <Typography variant="body2" sx={{ color: "white" }}>
+                <Typography variant="body2" sx={{ color: "white"  }}>
                   Section:{" "}
                   <span style={{ color: "teal", fontWeight: 800 }}>
                     {formValues.route}

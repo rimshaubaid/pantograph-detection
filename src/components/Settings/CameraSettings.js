@@ -25,12 +25,7 @@ const CameraSettings = () => {
   const [availableResolutions, setAvailableResolutions] = useState([]);
   const [videoStream, setVideoStream] = useState(null);
   const [openSettingsDialog, setOpenSettingsDialog] = useState(false);
-  const [settings, setSettings] = useState({
-    brightness: 100,
-    contrast: 100,
-    saturation: 100,
-  });
-
+  const [integerId,setIntegerId] = useState(0);
   // Function to handle opening the advanced settings dialog
   const handleOpenSettingsDialog = () => {
     setOpenSettingsDialog(true);
@@ -55,9 +50,14 @@ const CameraSettings = () => {
   }, []);
 
   const handleCameraChange = async (event) => {
-    const selectedCameraId = event.target.value;
+  
+    const selectedIndex = event.target.value; // Get the index of the selected camera
+   
+    const selectedCameraId = cameras[selectedIndex].deviceId;
+  
+    setIntegerId(`camera${selectedIndex}`);
     setCamera(selectedCameraId);
-
+ 
     // Stop any existing video stream
     if (videoStream) {
       videoStream.getTracks().forEach((track) => track.stop());
@@ -72,7 +72,7 @@ const CameraSettings = () => {
       // Get the video track from the stream and its capabilities
       const videoTrack = stream.getVideoTracks()[0];
       const capabilities = videoTrack.getCapabilities();
-      console.log('cap',capabilities)
+
       // Extract supported resolutions from capabilities
       const { width, height } = capabilities;
       if (width && height) {
@@ -118,24 +118,9 @@ const CameraSettings = () => {
     }
   };
 
-  // Handle advanced settings (e.g., brightness, contrast)
-  // const handleAdvancedSettingChange = (event, newValue, setting) => {
-  //   setSettings((prevSettings) => ({
-  //     ...prevSettings,
-  //     [setting]: newValue,
-  //   }));
-
-  //   if (videoStream) {
-  //     const videoTrack = videoStream.getVideoTracks()[0];
-      
-  //     videoTrack.applyConstraints({
-  //       advanced: [{ [setting]: newValue / 100 }],
-  //     });
-  //   }
-  // };
-
   const save = () => {
     localStorage.setItem("resolution", resolution);
+    localStorage.setItem("deviceId",integerId)
     localStorage.setItem("camera_type", camera);
     alert("Camera settings saved");
   };
@@ -183,8 +168,8 @@ const CameraSettings = () => {
             onChange={handleCameraChange}
             sx={{ color: "#fff", fontWeight: "bold" }}
           >
-            {cameras.map((cam) => (
-              <MenuItem key={cam.deviceId} value={cam.deviceId}>
+            {cameras.map((cam,index) => (
+              <MenuItem key={cam.deviceId} value={index}>
                 {cam.label || `Camera ${cameras.indexOf(cam) + 1}`}
               </MenuItem>
             ))}
@@ -225,62 +210,6 @@ const CameraSettings = () => {
         </Button>
       </Box>
       
-      {/* Advanced Settings Accordion */}
-      {/* <Accordion sx={{ width: "80%", marginBottom: 4 }}>
-        <AccordionSummary
-          expandIcon={<ExpandMore sx={{ color: "#00E5FF" }} />}
-          aria-controls="advanced-settings-content"
-          id="advanced-settings-header"
-        >
-          <Typography sx={{ color: "#00E5FF", fontWeight: "bold" }}>
-            Advanced Settings
-          </Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            <Typography variant="h6" sx={{ color: "#fff" }}>
-              Brightness
-            </Typography>
-            <Slider
-              value={settings.brightness}
-              onChange={(e, newValue) =>
-                handleAdvancedSettingChange(e, newValue, "brightness")
-              }
-              aria-labelledby="brightness-slider"
-              min={0}
-              max={200}
-              sx={{ color: "#00E5FF" }}
-            />
-            <Typography variant="h6" sx={{ color: "#fff" }}>
-              Contrast
-            </Typography>
-            <Slider
-              value={settings.contrast}
-              onChange={(e, newValue) =>
-                handleAdvancedSettingChange(e, newValue, "contrast")
-              }
-              aria-labelledby="contrast-slider"
-              min={0}
-              max={200}
-              sx={{ color: "#00E5FF" }}
-            />
-            <Typography variant="h6" sx={{ color: "#fff" }}>
-              Saturation
-            </Typography>
-            <Slider
-              value={settings.saturation}
-              onChange={(e, newValue) =>
-                handleAdvancedSettingChange(e, newValue, "saturation")
-              }
-              aria-labelledby="saturation-slider"
-              min={0}
-              max={200}
-              sx={{ color: "#00E5FF" }}
-            />
-          </Box>
-        </AccordionDetails>
-      </Accordion> */}
-
       <Box
         sx={{
           display: "flex",
