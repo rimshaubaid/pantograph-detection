@@ -17,10 +17,12 @@ import {
 } from "@mui/material";
 import CameraAdvancedSettings from "./AdvancedSettings.js";
 import { VideocamOff , ExpandMore } from "@mui/icons-material";
-
+import axios from "axios";
+const apiUrl = process.env.REACT_APP_API_URL;
 const CameraSettings = () => {
   const [cameras, setCameras] = useState([]);
   const [camera, setCamera] = useState("");
+  const [camName,setCamName] = useState("");
   const [resolution, setResolution] = useState("");
   const [availableResolutions, setAvailableResolutions] = useState([]);
   const [videoStream, setVideoStream] = useState(null);
@@ -35,8 +37,8 @@ const CameraSettings = () => {
   const handleCloseSettingsDialog = () => {
     setOpenSettingsDialog(false);
   };
-  // Fetch the list of connected cameras
-    // useEffect(() => {
+
+  //   useEffect(() => {
   //   // Fetch the list of connected cameras
   //   const getCameras = async () => {
   //     try {
@@ -67,10 +69,10 @@ const CameraSettings = () => {
     const selectedIndex = event.target.value; // Get the index of the selected camera
    
     const selectedCameraId = cameras[selectedIndex].deviceId;
-  
+    const selectedCamName = cameras[selectedIndex].label;
     setIntegerId(`camera${selectedIndex}`);
     setCamera(selectedCameraId);
- 
+
     // Stop any existing video stream
     if (videoStream) {
       videoStream.getTracks().forEach((track) => track.stop());
@@ -183,7 +185,7 @@ const CameraSettings = () => {
             sx={{ color: "#fff", fontWeight: "bold" }}
           >
             {cameras.map((cam,index) => (
-              <MenuItem key={cam.deviceId} value={index}>
+              <MenuItem key={index} value={index}>
                 {cam.label || `Camera ${cameras.indexOf(cam) + 1}`}
               </MenuItem>
             ))}

@@ -119,18 +119,18 @@ const CameraView = () => {
   useEffect(() => {
     const timer = setInterval(() => {
       const now = new Date();
-      const formattedDateTime = now.toLocaleString("en-US", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: false,
-      });
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed
+      const day = String(now.getDate()).padStart(2, "0");
+      const hours = String(now.getHours()).padStart(2, "0");
+      const minutes = String(now.getMinutes()).padStart(2, "0");
+      const seconds = String(now.getSeconds()).padStart(2, "0");
+  
+      // Format: YYYY-MM-DD HH:MM:SS
+      const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
       setCurrentDateTime(formattedDateTime);
     }, 1000); // Update every second
-
+  
     return () => clearInterval(timer); // Cleanup the interval on component unmount
   }, []);
 
@@ -262,8 +262,9 @@ const CameraView = () => {
       try {
   
         const data = JSON.parse(event.data);
-      
+        //console.group('d',data)
         if (data.processed_frame) {
+
           setCurrentFrame(data.processed_frame);
           setContactPoints(data.contact_points);
           setHeight(data.pantograph_height);
@@ -904,7 +905,13 @@ const CameraView = () => {
                   {isFullScreen ? <FullscreenExit /> : <Fullscreen />}
                 </IconButton>
               </Box>
-              <Box sx={{ position: "absolute", top: 10, left: 10  }}>
+              <Box sx={{ position: "absolute", top: 10, left: 10 }}>
+                <Typography variant="body2" sx={{ color: "white" }}>
+                  PantoHeight:{" "}
+                  <span style={{ color: "teal", fontWeight: 800 }}>
+                    {height}
+                  </span>
+                </Typography>
                 <Typography variant="body2" sx={{ color: "white" }}>
                   CP 1:{" "}
                   <span style={{ color: "teal", fontWeight: 800 }}>
@@ -919,13 +926,13 @@ const CameraView = () => {
                   </span>
                 </Typography>
                 <Typography variant="body2" sx={{ color: "white" }}>
-                  CP 3: {" "}
+                  CP 3:{" "}
                   <span style={{ color: "teal", fontWeight: 800 }}>
                     {contactPoints && contactPoints[2]}
                   </span>
                 </Typography>
-                <Typography variant="body2" sx={{ color: "white"  }}>
-                 CP 4:
+                <Typography variant="body2" sx={{ color: "white" }}>
+                  CP 4:
                   <span style={{ color: "teal", fontWeight: 800 }}>
                     {contactPoints && contactPoints[3]}
                   </span>
@@ -936,41 +943,34 @@ const CameraView = () => {
                     {contactPoints && contactPoints[4]}
                   </span>
                 </Typography>
-                <Typography variant="body2" sx={{ color: "white"  }}>
-                  PantoHeight:{" "}
-                  <span style={{ color: "teal", fontWeight: 800 }}>
-                    {height}
-                  </span>
-                </Typography>
               </Box>
               <Grid
                 container
-                sx={{ position: "absolute", bottom: 10, left: 10 }}
+                sx={{ position: "absolute", bottom: 30, left: 10 }}
                 justifyContent="space-around"
               >
-                <Typography variant="body2" sx={{ color: "white"  }}>
+                <Typography variant="body2" sx={{ color: "white" }}>
                   Section:{" "}
                   <span style={{ color: "teal", fontWeight: 800 }}>
                     {formValues.route}
                   </span>
                 </Typography>
                 <Typography variant="body2" sx={{ color: "white" }}>
-               
-                  <span style={{ color: "teal", fontWeight: 800 }}>00KMH</span>
+                  <span style={{ color: "teal", fontWeight: 800 }}>
+                    [Location : {currLocation} (0) (P) , {nextLocation} (0) (N) ]
+                  </span>
                 </Typography>
                 <Typography variant="body2" sx={{ color: "white" }}>
-
+                  Speed:
+                  <span style={{ color: "teal", fontWeight: 800 }}>00</span>
+                </Typography>
+                <Typography variant="body2" sx={{ color: "white" }}>
                   <span style={{ color: "teal", fontWeight: 800 }}>
                     {currentDateTime}
                   </span>
                 </Typography>
-                <Typography variant="body2" sx={{ color: "white" }}>
-                  Location:{" "}
-                  <span style={{ color: "teal", fontWeight: 800 }}>
-                    {prevLocation} (P) {currLocation} (C) {nextLocation} (N)
-                  </span>
-                </Typography>
               </Grid>
+             
             </Box>
 
             <Divider sx={{ marginY: 2 }} />
