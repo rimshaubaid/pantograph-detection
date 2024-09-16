@@ -56,8 +56,10 @@ const CameraView = () => {
   const [videoUrl, setVideoUrl] = useState(null);
   const [lang, setLang] = useState(0);
   const [lat, setLat] = useState(0);
-  
+  const [prevDistance,setPrevDistance] = useState(0);
+  const [nextDistance,setNextDistance] = useState(0);
   const [gpsPort, setGpsPort] = useState("");
+  const [speed,setSpeed] = useState(0);
   const [openModal, setOpenModal] = useState(true);
   const [ffmpegLoaded, setFfmpegLoaded] = useState(false);
   const [prevLocation, setPrevLocation] = useState("");
@@ -273,6 +275,9 @@ const CameraView = () => {
           setCurrLocation(data.current_location);
           setPrevLocation(data.previous_location);
           setNextLocation(data.next_location);
+          setPrevDistance(data.previous_distance);
+          setNextDistance(data.next_distance);
+          setSpeed(data.speed_kmh);
         }
       } catch (error) {
         console.error("Error parsing event data:", error);
@@ -957,12 +962,12 @@ const CameraView = () => {
                 </Typography>
                 <Typography variant="body2" sx={{ color: "white" }}>
                   <span style={{ color: "teal", fontWeight: 800 }}>
-                    [Location : {currLocation} (0) (P) , {nextLocation} (0) (N) ]
+                    [Location : {currLocation} ({prevDistance}) (P) , {nextLocation} ({nextDistance}) (N) ]
                   </span>
                 </Typography>
                 <Typography variant="body2" sx={{ color: "white" }}>
                   Speed:
-                  <span style={{ color: "teal", fontWeight: 800 }}>00</span>
+                  <span style={{ color: "teal", fontWeight: 800 }}>{speed}</span>
                 </Typography>
                 <Typography variant="body2" sx={{ color: "white" }}>
                   <span style={{ color: "teal", fontWeight: 800 }}>
@@ -1145,7 +1150,7 @@ const CameraView = () => {
                   margin: "10px 0",
                 }}
               >
-                000.00 KM/H
+                {speed} KM/H
               </Typography>
 
               <Box
