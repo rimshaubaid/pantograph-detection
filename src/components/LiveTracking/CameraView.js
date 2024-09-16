@@ -56,6 +56,7 @@ const CameraView = () => {
   const [videoUrl, setVideoUrl] = useState(null);
   const [lang, setLang] = useState(0);
   const [lat, setLat] = useState(0);
+  
   const [gpsPort, setGpsPort] = useState("");
   const [openModal, setOpenModal] = useState(true);
   const [ffmpegLoaded, setFfmpegLoaded] = useState(false);
@@ -98,7 +99,8 @@ const CameraView = () => {
   const [contactPoints, setContactPoints] = useState(null);
   const [height, setHeight] = useState(null);
   const [routeData, setRouteData] = useState([]);
-
+  const [gpsLang,setGPSLang] = useState(0);
+  const [gpsLat,setGPSLat] = useState(0);
   useEffect(() => {
     getRouteData();
   }, []);
@@ -185,7 +187,7 @@ const CameraView = () => {
     //if camera isnt selected
     const cam = localStorage.getItem("deviceId");
     const res = localStorage.getItem("resolution");
-   
+     console.log('hereee')
     if (!cam) {
       setSelectedCamera("camera0");
     } else {
@@ -236,7 +238,12 @@ const CameraView = () => {
     try {
       const requestBody = { serial_port: gpsPort };
 
-      await axios.post(`${apiUrl}/connect_gps`, requestBody);
+      const response = await axios.post(`${apiUrl}/connect_gps`, requestBody);
+      if(response){
+        setGPSLang(response.data.longitude);
+        setGPSLat(response.data.latitude);
+      }
+   
     } catch (err) {
       alert(err?.response?.data?.error);
     }
@@ -246,15 +253,16 @@ const CameraView = () => {
     if (!formValues?.route) {
       return; // Do not proceed if formValues.route doesn't exist
     }
-
+    
     const eventSource = new EventSource(
       `${apiUrl}/process-camera-feed?device_id=${selectedCamera}&resolution=${selectedResolution}&route=${formValues?.route}`
     );
 
     eventSource.onmessage = (event) => {
       try {
+  
         const data = JSON.parse(event.data);
-
+      
         if (data.processed_frame) {
           setCurrentFrame(data.processed_frame);
           setContactPoints(data.contact_points);
@@ -896,7 +904,7 @@ const CameraView = () => {
                   {isFullScreen ? <FullscreenExit /> : <Fullscreen />}
                 </IconButton>
               </Box>
-              <Box sx={{ position: "absolute", top: 10, left: 10 , display:"flex" }}>
+              <Box sx={{ position: "absolute", top: 10, left: 10  }}>
                 <Typography variant="body2" sx={{ color: "white" }}>
                   CP 1:{" "}
                   <span style={{ color: "teal", fontWeight: 800 }}>
@@ -904,31 +912,31 @@ const CameraView = () => {
                   </span>
                 </Typography>
 
-                <Typography variant="body2" sx={{ color: "white",marginLeft:2 }}>
+                <Typography variant="body2" sx={{ color: "white" }}>
                   CP 2:{" "}
                   <span style={{ color: "teal", fontWeight: 800 }}>
                     {contactPoints && contactPoints[1]}
                   </span>
                 </Typography>
-                <Typography variant="body2" sx={{ color: "white",marginLeft:2  }}>
+                <Typography variant="body2" sx={{ color: "white" }}>
                   CP 3: {" "}
                   <span style={{ color: "teal", fontWeight: 800 }}>
                     {contactPoints && contactPoints[2]}
                   </span>
                 </Typography>
-                <Typography variant="body2" sx={{ color: "white",marginLeft:2  }}>
+                <Typography variant="body2" sx={{ color: "white"  }}>
                  CP 4:
                   <span style={{ color: "teal", fontWeight: 800 }}>
                     {contactPoints && contactPoints[3]}
                   </span>
                 </Typography>
-                <Typography variant="body2" sx={{ color: "white",marginLeft:2  }}>
+                <Typography variant="body2" sx={{ color: "white" }}>
                   CP 5:
                   <span style={{ color: "teal", fontWeight: 800 }}>
                     {contactPoints && contactPoints[4]}
                   </span>
                 </Typography>
-                <Typography variant="body2" sx={{ color: "white",marginLeft:2  }}>
+                <Typography variant="body2" sx={{ color: "white"  }}>
                   PantoHeight:{" "}
                   <span style={{ color: "teal", fontWeight: 800 }}>
                     {height}
@@ -947,11 +955,11 @@ const CameraView = () => {
                   </span>
                 </Typography>
                 <Typography variant="body2" sx={{ color: "white" }}>
-                  Speed:{" "}
+               
                   <span style={{ color: "teal", fontWeight: 800 }}>00KMH</span>
                 </Typography>
                 <Typography variant="body2" sx={{ color: "white" }}>
-                  Time:{" "}
+
                   <span style={{ color: "teal", fontWeight: 800 }}>
                     {currentDateTime}
                   </span>
@@ -1199,7 +1207,7 @@ const CameraView = () => {
                   <Explore sx={{ marginRight: 1 }} />
                   <Typography style={{ fontSize: "1vw" }}>Longitude</Typography>
                 </Box>
-                <Typography style={{ fontSize: "1vw" }}>{lang}</Typography>
+                <Typography style={{ fontSize: "1vw" }}>{gpsLang}</Typography>
               </Box>
 
               <Box
@@ -1213,7 +1221,7 @@ const CameraView = () => {
                   <Explore sx={{ marginRight: 1 }} />
                   <Typography style={{ fontSize: "1vw" }}>Latitude</Typography>
                 </Box>
-                <Typography style={{ fontSize: "1vw" }}>{lat}</Typography>
+                <Typography style={{ fontSize: "1vw" }}>{gpsLat}</Typography>
               </Box>
 
               <Box

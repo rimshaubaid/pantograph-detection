@@ -36,6 +36,19 @@ const CameraSettings = () => {
     setOpenSettingsDialog(false);
   };
   // Fetch the list of connected cameras
+    // useEffect(() => {
+  //   // Fetch the list of connected cameras
+  //   const getCameras = async () => {
+  //     try {
+  //       const response = await axios.get(`${apiUrl}/list-cameras`);
+  //       setCameras(response.data.cameras);
+  //     } catch (error) {
+  //       console.error("Error accessing media devices.", error);
+  //     }
+  //   };
+
+  //   getCameras();
+  // }, []);
   useEffect(() => {
     const getCameras = async () => {
       try {
@@ -117,6 +130,7 @@ const CameraSettings = () => {
       }
     }
   };
+
 
   const save = () => {
     localStorage.setItem("resolution", resolution);
