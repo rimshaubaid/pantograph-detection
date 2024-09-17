@@ -189,14 +189,14 @@ const CameraView = () => {
     //if camera isnt selected
     const cam = localStorage.getItem("deviceId");
     const res = localStorage.getItem("resolution");
-   
+     console.log('hereee')
     if (!cam) {
       setSelectedCamera("camera0");
     } else {
       setSelectedCamera(cam);
     }
     if (res) {
-      setSelectedResolution("640x480");
+      setSelectedResolution(res);
     } else {
       setSelectedResolution("640x480");
     }
@@ -257,7 +257,7 @@ const CameraView = () => {
     }
     
     const eventSource = new EventSource(
-      `${apiUrl}/process-camera-feed?device_id=${selectedCamera}&resolution=${selectedResolution}&route=${formValues?.route}`
+      `${apiUrl}/process-camera-feed?device_id=${selectedCamera}&route=${formValues?.route}`
     );
 
     eventSource.onmessage = (event) => {
