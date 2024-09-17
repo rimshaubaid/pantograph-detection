@@ -189,14 +189,14 @@ const CameraView = () => {
     //if camera isnt selected
     const cam = localStorage.getItem("deviceId");
     const res = localStorage.getItem("resolution");
-     console.log('hereee')
+   
     if (!cam) {
       setSelectedCamera("camera0");
     } else {
       setSelectedCamera(cam);
     }
     if (res) {
-      setSelectedResolution(res);
+      setSelectedResolution("640x480");
     } else {
       setSelectedResolution("640x480");
     }
