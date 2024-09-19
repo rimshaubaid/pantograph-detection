@@ -304,7 +304,7 @@ const CameraView = () => {
     if(!formValues.route){
       return;
     }
-    if(!selectedCamera){
+    if(selectedCamera === null){
       return;
     }
     const fetchFrame = async () => {
