@@ -1,17 +1,12 @@
-import React from 'react';
-import { Typography, Box } from '@mui/material';
-
+import React from "react";
+import { Box } from "@mui/material";
+import HomeImg from "../assets/images/home.jpeg";
 const Home = () => {
-    return (
-        <Box sx={{paddingTop:7}}>
-            <Typography variant="h2" gutterBottom>
-                Welcome to Home Page
-            </Typography>
-            <Typography variant="body1">
-                This is the home page of your application.
-            </Typography>
-        </Box>
-    );
+  return (
+    <Box sx={{ paddingTop: 7 }}>
+      <img src={HomeImg} />
+    </Box>
+  );
 };
 
 export default Home;
