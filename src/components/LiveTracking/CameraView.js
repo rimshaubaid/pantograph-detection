@@ -189,7 +189,7 @@ const CameraView = () => {
     //if camera isnt selected
     const cam = localStorage.getItem("deviceId");
     const res = localStorage.getItem("resolution");
-     console.log('hereee')
+
     if (!cam) {
       setSelectedCamera("camera0");
     } else {
@@ -251,23 +251,67 @@ const CameraView = () => {
     }
   };
   
-  useEffect(() => {
-    if (!formValues?.route) {
-      return; // Do not proceed if formValues.route doesn't exist
-    }
+  // useEffect(() => {
+  //   if (!formValues?.route) {
+  //     return; // Do not proceed if formValues.route doesn't exist
+  //   }
     
-    const eventSource = new EventSource(
-      `${apiUrl}/process-camera-feed?device_id=${selectedCamera}&route=${formValues?.route}`
-    );
+  //   const eventSource = new EventSource(
+  //     `${apiUrl}/process-camera-feed?device_id=${selectedCamera}&route=${formValues?.route}`
+  //   );
 
-    eventSource.onmessage = (event) => {
-      try {
+  //   eventSource.onmessage = (event) => {
+  //     try {
   
-        const data = JSON.parse(event.data);
-        //console.group('d',data)
-        if (data.processed_frame) {
+  //       const data = JSON.parse(event.data);
+  //       console.group('d',data)
+  //       if (data.processed_frame) {
 
-          setCurrentFrame(data.processed_frame);
+  //         setCurrentFrame(data.processed_frame);
+  //         setContactPoints(data.contact_points);
+  //         setHeight(data.pantograph_height);
+  //         setLang(data.longitude);
+  //         setLat(data.latitude);
+  //         setCurrLocation(data.current_location);
+  //         setPrevLocation(data.previous_location);
+  //         setNextLocation(data.next_location);
+  //         setPrevDistance(data.previous_distance);
+  //         setNextDistance(data.next_distance);
+  //         setSpeed(data.speed_kmh);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error parsing event data:", error);
+  //     }
+  //   };
+
+  //   eventSource.onerror = () => {
+  //     console.error("Error connecting to server:");
+  //   };
+
+  //   return () => {
+  //     eventSource.close();
+  //   };
+  // }, [handleSubmit]);
+
+  // useEffect(() => {
+  //   if (currentFrame && frameRef.current) {
+  //     frameRef.current.src = `data:image/jpeg;base64,${currentFrame}`;
+  //   }
+  // }, [currentFrame]);
+  const [frameData, setFrameData] = useState(null); // State to hold the frame data
+
+  useEffect(() => {
+    const fetchFrame = async () => {
+      try {
+        const response = await fetch(
+          `${apiUrl}/process-camera-feed?camera_type=${selectedCamera}&resolution=640x480`
+        );
+        const data = await response.json(); // Parse JSON response
+
+        if (data?.frame) {
+          setFrameData(data); // Save the entire data, including the frame
+           // Update other pieces of information
+
           setContactPoints(data.contact_points);
           setHeight(data.pantograph_height);
           setLang(data.longitude);
@@ -280,24 +324,27 @@ const CameraView = () => {
           setSpeed(data.speed_kmh);
         }
       } catch (error) {
-        console.error("Error parsing event data:", error);
+        console.error('Error fetching the camera feed:', error);
       }
     };
 
-    eventSource.onerror = () => {
-      console.error("Error connecting to server:");
-    };
+    // Only fetch frames if the feed is not paused
+    if (!isPaused) {
+      const intervalId = setInterval(() => {
+        fetchFrame();
+      }, 100); // Fetch the frame every second
 
-    return () => {
-      eventSource.close();
-    };
-  }, [handleSubmit]);
+      return () => clearInterval(intervalId); // Cleanup on component unmount or if paused
+    }
+  }, [openModal, isPaused]);
 
   useEffect(() => {
-    if (currentFrame && frameRef.current) {
-      frameRef.current.src = `data:image/jpeg;base64,${currentFrame}`;
+    // When frameData is updated, update the img source
+    if (frameData?.frame && frameRef.current) {
+      frameRef.current.src = `data:image/jpeg;base64,${frameData.frame}`; // Convert the base64 frame to an image source
     }
-  }, [currentFrame]);
+  }, [frameData]);
+
 
   const saveVideo = async () => {
     if (!ffmpegLoaded) {
