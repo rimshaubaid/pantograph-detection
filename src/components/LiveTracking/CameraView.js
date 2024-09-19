@@ -112,7 +112,7 @@ const CameraView = () => {
       const data = response?.data?.data;
 
       // Extract only the Route names
-      const routes = data.map((item) => item.Route);
+      const routes = [...new Set(data.map((item) => item.Route))];
 
       // Set state with Route names
       setRouteData(routes);
@@ -189,9 +189,9 @@ const CameraView = () => {
     //if camera isnt selected
     const cam = localStorage.getItem("deviceId");
     const res = localStorage.getItem("resolution");
-
+    
     if (!cam) {
-      setSelectedCamera("camera0");
+      setSelectedCamera(0);
     } else {
       setSelectedCamera(cam);
     }
@@ -301,10 +301,16 @@ const CameraView = () => {
   const [frameData, setFrameData] = useState(null); // State to hold the frame data
 
   useEffect(() => {
+    if(!formValues.route){
+      return;
+    }
+    if(!selectedCamera){
+      return;
+    }
     const fetchFrame = async () => {
       try {
         const response = await fetch(
-          `${apiUrl}/process-camera-feed?camera_type=${selectedCamera}&resolution=640x480`
+          `${apiUrl}/process-camera-feed?camera_type=${selectedCamera}&resolution=${selectedResolution}&route=${formValues.route}`
         );
         const data = await response.json(); // Parse JSON response
 

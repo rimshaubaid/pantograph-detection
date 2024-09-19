@@ -70,7 +70,7 @@ const CameraSettings = () => {
    
     const selectedCameraId = cameras[selectedIndex].deviceId;
     const selectedCamName = cameras[selectedIndex].label;
-    setIntegerId(`camera${selectedIndex}`);
+    setIntegerId(selectedIndex);
     setCamera(selectedCameraId);
 
     // Stop any existing video stream
