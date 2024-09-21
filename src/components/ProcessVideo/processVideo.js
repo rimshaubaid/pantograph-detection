@@ -67,14 +67,74 @@ const VideoUploadAndStream = () => {
           if (parsed?.frame) setFrames((prev) => [...prev, parsed?.frame]); // Accumulate frames
         });
       }
+
       setIsLoading(false);
     } catch (error) {
       console.error("Error processing video:", error);
       setIsLoading(false);
     } finally {
-      
+     
     }
   };
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/fetch_video_data`, {
+        method: 'GET', // or 'POST' depending on your API
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const result = await response.json(); // parse the JSON from the response
+     
+      const headers = [
+        "Id",
+        "CP 1",
+        "CP 2",
+        "CP 3",
+        "CP 4",
+        "CP 5",
+        "Frame Number",
+        "Inclination",
+        "Pantograph Height",
+        "Uplift force"
+        
+      ];
+      const csvRows = [headers.join(",")];
+      result?.data?.forEach((item) => {
+        const row = [
+          item.id || "-",          // Handle null or undefined values
+          item.cp1 || "-",
+          item.cp2|| "-",
+          item.cp3 || "-",
+          item.cp4 || "-",
+          item.cp5 || "-",
+          item.inclination || "-",
+          item.pantograph_height || "-",
+          item.uplift_force || "-",
+        
+        ].join(",");
+       
+        csvRows.push(row);
+      });
+      const csvContent = csvRows.join("\n");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+  
+      link.href = url;
+      link.setAttribute("download", "processed_video_report.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+     // setError(error.message);
+    } finally {
+     // setLoading(false); // End loading
+    }
+  }
   
 
   const saveVideo = async () => {
@@ -155,6 +215,13 @@ const VideoUploadAndStream = () => {
                <Button variant="outlined" onClick={togglePause} sx={{marginRight:3}}>
                 {isPaused ? "Resume" : "Pause"}
               </Button>
+              {!isLoading && <Button
+                variant="outlined"
+                onClick={fetchData}
+                disabled={isVideoProcessing}
+              >
+               Download Report
+              </Button>}
              {!isVideoProcessing  && <Button
                 variant="outlined"
                 onClick={saveVideo}
