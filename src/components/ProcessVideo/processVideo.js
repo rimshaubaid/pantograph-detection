@@ -71,8 +71,11 @@ const VideoUploadAndStream = () => {
     } catch (error) {
       console.error("Error processing video:", error);
       setIsLoading(false);
+    } finally {
+      
     }
   };
+  
 
   const saveVideo = async () => {
     if (!ffmpegLoaded) {

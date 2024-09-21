@@ -64,13 +64,12 @@ const CameraSettings = () => {
     getCameras();
   }, []);
 
-  const handleCameraChange = async (event,index) => {
-    console.log('i',index?.props?.value)
-    const selectedIndex = index?.props?.value; // Get the index of the selected camera
-    const selectedCameraId = cameras[selectedIndex].deviceId;
-    const selectedCamName = cameras[selectedIndex].label;
+  const handleCameraChange = async (event) => {
+    const selectedCameraId = event.target.value;
+    const selectedIndex = cameras.findIndex((cam) => cam.deviceId === selectedCameraId); // Get the index of the selected camera
+  
     setIntegerId(selectedIndex);
-    setCamera(event.target.value);
+    setCamera(selectedCameraId);
   
     // Stop any existing video stream
     if (videoStream) {
@@ -91,22 +90,25 @@ const CameraSettings = () => {
       const { width, height } = capabilities;
       if (width && height) {
         const resolutions = [];
-        const minWidth = 320; // Start with 320 width
-        const minHeight = 128; // Start with 128 height
-        const widthStep = 320; // Step for width increments
-        const heightStep = 128; // Step for height increments
-  
-        // Start from the maximum width and height
-      for (let w = width.max, h = height.max; w >= minWidth && h >= minHeight; w -= widthStep, h -= heightStep) {
-        resolutions.push({
-          width: w,
-          height: h,
-          label: `${w}x${h}`,
+        
+        // Use common width intervals like 320, 640, etc.
+        const commonWidths = [320, 640, 800, 1024, 1280]; // Add more resolutions if needed
+        
+        commonWidths.forEach((commonWidth) => {
+          if (commonWidth <= width.max && commonWidth >= width.min) {
+            const commonHeight = Math.floor((commonWidth * height.max) / width.max); // Maintain aspect ratio
+            if (commonHeight <= height.max && commonHeight >= height.min) {
+              resolutions.push({
+                width: commonWidth,
+                height: commonHeight,
+                label: `${commonWidth}x${commonHeight}`,
+              });
+            }
+          }
         });
-      }
-
   
         setAvailableResolutions(resolutions);
+        console.log('Available Resolutions:', resolutions);
       }
     } catch (error) {
       console.error("Error accessing camera:", error);
@@ -114,12 +116,13 @@ const CameraSettings = () => {
   };
   
 
+
   const handleResolutionChange = async (event) => {
     const selectedResolution = availableResolutions.find(
       (res) => res.label === event.target.value
     );
     setResolution(event.target.value);
-
+ 
     if (camera && selectedResolution) {
       // Stop the current stream before changing resolution
       if (videoStream) {
@@ -139,8 +142,8 @@ const CameraSettings = () => {
         console.error("Error changing resolution:", error);
       }
     }
-  };
-
+  };  
+ 
 
   const save = () => {
     localStorage.setItem("resolution", resolution);
@@ -193,7 +196,8 @@ const CameraSettings = () => {
             sx={{ color: "#fff", fontWeight: "bold" }}
           >
             {cameras.map((cam,index) => (
-              <MenuItem key={index} value={index}>
+              <MenuItem key={index}  value={cam.deviceId} // Value should be deviceId
+              data-index={index} >
                 {cam.label || `Camera ${cameras.indexOf(cam) + 1}`}
               </MenuItem>
             ))}
