@@ -44,7 +44,7 @@ import {
 } from "@mui/icons-material";
 
 import { useNavigate } from "react-router-dom";
-
+let framesArray = [];
 const apiUrl = process.env.REACT_APP_API_URL;
 const CameraView = () => {
   const navigate = useNavigate();
@@ -315,9 +315,10 @@ const CameraView = () => {
         const data = await response.json(); // Parse JSON response
 
         if (data?.frame) {
+          
           setFrameData(data); // Save the entire data, including the frame
            // Update other pieces of information
-
+          framesArray.push(data?.frame);
           setContactPoints(data.contact_points);
           setHeight(data.pantograph_height);
           setLang(data.longitude);
@@ -351,7 +352,7 @@ const CameraView = () => {
     }
   }, [frameData]);
 
-
+  
   const saveVideo = async () => {
     if (!ffmpegLoaded) {
       await ffmpeg.load();
@@ -360,8 +361,8 @@ const CameraView = () => {
     setIsVideoProcessing(true);
 
     // Save each frame as an image file in FFmpeg's virtual file system
-    for (let i = 0; i < frames.length; i++) {
-      const frame = frames[i];
+    for (let i = 0; i < framesArray.length; i++) {
+      const frame = framesArray[i];
 
       await ffmpeg.writeFile(
         `frame${i}.jpg`,

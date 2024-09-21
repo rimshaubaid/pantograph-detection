@@ -28,12 +28,72 @@ import {
 import { PhotoCamera } from "@mui/icons-material";
 import axios from "axios";
 const apiUrl = process.env.REACT_APP_API_URL;
+  // Convert data to CSV format
+  const headers = [
+    "Id",
+    "Route",
+    "Section",
+    "CP 1",
+    "CP 2",
+    "CP 3",
+    "CP 4",
+    "CP 5",
+    "Feature ENG",
+    "Feature TRD",
+    
+  ];
+
+  const masterReportHeaders = [
+    "Distance Between Mast",
+    "Gradient Descent N",
+    "Gradient Descent P",
+    "IMP",
+    "Line",
+    "More Than 3mm per meter",
+    "Next Loc",
+    "Panto Height Next",
+    "Panto Height Previous",
+    "Previous Loc",
+    "Relative Gradient Descent",
+    "S No",
+    "Section",
+    "Speed (km/h)",
+    "Stagger 1",
+    "Stagger 2",
+    "Stagger 3",
+    "Stagger 4",
+    "Stagger 5",
+    "Taken At"
+  ];
+  const gradientHeaders = [
+    "Distance Between Mast",
+    "Gradient Descent N",
+    "Gradient Descent P",
+    "Greater Than 3mm per meter",
+    "Line",
+    "Location N",
+    "Location P",
+    "OHE Height N",
+    "OHE Height P",
+    "Relative Gradient Descent",
+    "S No",
+    "Section",
+    "Speed (km/h)",
+    "Taken At"
+  ];
+  
 const SparkDataView = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [format, setFormat] = useState("text");
+  const [reportType,setReportType] = useState("");
   const [fileType, setFileType] = useState("excel");
   const [data, setData] = useState([]); // State for storing API data
-  const handleDialogOpen = () => setOpenDialog(true);
+  const handleDialogOpen =  (value) => {
+    setReportType(value)
+    setOpenDialog(true);
+
+    
+  };
   const handleDialogClose = () => setOpenDialog(false);
   const handleFormatChange = (event) => setFormat(event.target.value);
   const handleFileTypeChange = (event) => setFileType(event.target.value);
@@ -50,6 +110,7 @@ const SparkDataView = () => {
   };
 
   const handleGradientOptionClick = (option) => {
+    setReportType(option);
     handleGraidentMenuClose(); // Close the menu
     handleDialogOpen(option); // Pass the selected option
   };
@@ -67,31 +128,141 @@ const SparkDataView = () => {
     handleDialogOpen(option); // Pass the selected option
   };
 
- 
-  const handleDownload = () => {
+  
+  const handleGenerate = async () => {
+    if(reportType === "Master Report"){
+      generateMasterReport();
+    } else{
+      generateGraidentReport();
+    }
+  }
+
+  const generateMasterReport = async () => {
+    let result;
+    try {
+  
+      const response = await fetch(`${apiUrl}/fetch_master_data`, {
+        method: 'GET', // or 'POST' depending on your API
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      result = await response.json(); // parse the JSON from the response
+      const csvRows = [masterReportHeaders.join(",")];
+     
+      result?.data?.forEach((item) => {
+  
+        const row = [
+          item.Distance_Between_Mast || "-",     // Fallback to '-' if null
+          item.Gradient_Descent_N || "-",
+          item.Gradient_Descent_P || "-",
+          item.IMP || "-",
+          item.Line || "-",
+          item.More_Than_3mm_per_meter || "-",
+          item.Next_Loc || "-",
+          item.Panto_Height_Next || "-",
+          item.Panto_Height_Previous || "-",
+          item.Previous_Loc || "-",
+          item.Relative_Gradient_Descent || "-",
+          item.S_No || "-",
+          item.Section || "-",
+          item.Speed_kmh || "-",
+          item.Stagger_1 || "-",
+          item.Stagger_2 || "-",
+          item.Stagger_3 || "-",
+          item.Stagger_4 || "-",
+          item.Stagger_5 || "-",
+          item.Taken_At || "-"
+        ].join(",");
+      
+        csvRows.push(row);
+      });
+     
+      const csvContent = csvRows.join("\n");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+  
+      link.href = url;
+      link.setAttribute("download", "master_report.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+     // setError(error.message);
+    } finally {
+     
+  
+      handleDialogClose(); // Close the dialog after download
+    }
+  }
+
+  const generateGraidentReport = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/fetch_gradient_data`, {
+        method: 'GET', // or 'POST' depending on your API
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const result = await response.json(); // parse the JSON from the response
+      const csvRows = [gradientHeaders.join(",")];
+      
+      result?.data?.forEach((item) => {
+        const row = [
+          item.Distance_Between_Mast || "-",          // Handle null or undefined values
+          item.Gradient_Descent_N || "-",
+          item.Gradient_Descent_P || "-",
+          item.Greater_Than_3mm_per_meter || "-",
+          item.Line || "-",
+          item.Location_N || "-",
+          item.Location_P || "-",
+          item.OHE_Height_N || "-",
+          item.OHE_Height_P || "-",
+          item.Relative_Gradient_Descent || "-",
+          item.S_No || "-",
+          item.Section || "-",
+          item.Speed_kmh || "-",
+          item.Taken_At || "-"
+        ].join(",");
+       
+        csvRows.push(row);
+      });
+      const csvContent = csvRows.join("\n");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+  
+      link.href = url;
+      link.setAttribute("download", "gradient_report.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+     // setError(error.message);
+    } finally {
+     // setLoading(false); // End loading
+    }
+  }
+  const handleDownload = async () => {
     
       if (data.length === 0) {
         console.log("No data to download.");
         return;
       }
-  
-      // Convert data to CSV format
-      const headers = [
-        "Id",
-        "Route",
-        "Section",
-        "CP 1",
-        "CP 2",
-        "CP 3",
-        "CP 4",
-        "CP 5",
-        "Feature ENG",
-        "Feature TRD",
-        
-      ];
-  
+
       const csvRows = [headers.join(",")];
-  
+
       // Loop through data and convert each object to a CSV row
       data.forEach((item) => {
         const row = [
@@ -110,11 +281,10 @@ const SparkDataView = () => {
           item.imp,
           item.inclination,
           item.pantograph_height,
-          
-    
+
           item.uplift_force,
         ].join(",");
-  
+
         csvRows.push(row);
       });
   
@@ -130,10 +300,8 @@ const SparkDataView = () => {
       document.body.removeChild(link);
   
       handleDialogClose(); // Close the dialog after download
-    
-    // Handle the download logic based on format and fileType
-   // console.log(`Downloading ${format} as ${fileType}`);
-    handleDialogClose();
+   
+
   };
   // Pagination and rows per page change handler
   const handlePageChange = (event, newPage) => {
@@ -318,20 +486,25 @@ const SparkDataView = () => {
  
   <Grid container spacing={2} sx={{ marginTop: 3 }}>
     {/* First Row */}
-    <Grid item xs={1}>
+    {/* <Grid item xs={1}>
       <Button onClick={handleDialogOpen} variant="contained" fullWidth>
         <Typography style={{fontSize:"1vw"}}>OHE Height</Typography>
     
       </Button>
+    </Grid> */}
+    <Grid item xs={3}>
+      <Button onClick={() => handleDialogOpen("Master Report")} variant="contained" fullWidth>
+      <Typography style={{fontSize:"1vw"}}>Master Report</Typography>
+      </Button>
     </Grid>
-    <Grid item xs={1}>
+    {/* <Grid item xs={1}>
       <Button onClick={handleDialogOpen} variant="contained" fullWidth>
       <Typography style={{fontSize:"1vw"}}>CP</Typography>
       </Button>
-    </Grid>
+    </Grid> */}
 
     {/* Second Row */}
-    <Grid item xs={1}>
+    <Grid item xs={3}>
       <Button onClick={handleMenuGradientOpen} variant="contained" fullWidth>
       <Typography style={{fontSize:"1vw"}}>Gradient</Typography>
       </Button>
@@ -349,31 +522,31 @@ const SparkDataView = () => {
         </MenuItem>
       </Menu>
     </Grid>
-    <Grid item xs={1}>
+    {/* <Grid item xs={1}>
       <Button onClick={handleDialogOpen} variant="contained" fullWidth>
       <Typography style={{fontSize:"1vw"}}>IOL</Typography>
       </Button>
-    </Grid>
+    </Grid> */}
 
     {/* Third Row */}
-    <Grid item xs={1}>
+    {/* <Grid item xs={1}>
       <Button onClick={handleDialogOpen} variant="contained" fullWidth>
       <Typography style={{fontSize:"1vw"}}>UIOL</Typography>
       </Button>
-    </Grid>
-    <Grid item xs={1}>
+    </Grid> */}
+    {/* <Grid item xs={1}>
       <Button onClick={handleDialogOpen} variant="contained" fullWidth>
       <Typography style={{fontSize:"1vw"}}>X/0 & T/0</Typography>
       </Button>
-    </Grid>
+    </Grid> */}
 
     {/* Fourth Row */}
-    <Grid item xs={1}>
+    {/* <Grid item xs={1}>
       <Button onClick={handleDialogOpen} variant="contained" fullWidth>
       <Typography style={{fontSize:"1vw"}}>All Data</Typography>
       </Button>
-    </Grid>
-    <Grid item xs={1}>
+    </Grid> */}
+    {/* <Grid item xs={1}>
       <Button onClick={handleMenuWireOpen} variant="contained" fullWidth>
       <Typography style={{fontSize:"1vw"}}>Wire condition</Typography>
       </Button>
@@ -405,14 +578,14 @@ const SparkDataView = () => {
           Damaged Droppers
         </MenuItem>
       </Menu>
-    </Grid>
+    </Grid> */}
 
     {/* Fifth Row */}
-    <Grid item xs={1}>
+    {/* <Grid item xs={1}>
       <Button onClick={handleDialogOpen} variant="contained" fullWidth>
       <Typography style={{fontSize:"1vw"}}>Insulator</Typography>
       </Button>
-    </Grid>
+    </Grid> */}
   </Grid>
 
       {/* Dialog Component */}
@@ -440,7 +613,7 @@ const SparkDataView = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDialogClose}>Cancel</Button>
-          <Button onClick={handleDownload}>Download</Button>
+          <Button onClick={handleGenerate}>Download</Button>
         </DialogActions>
       </Dialog>
     </Box>
