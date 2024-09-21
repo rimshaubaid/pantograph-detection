@@ -43,7 +43,7 @@ const VideoUploadAndStream = () => {
         method: "POST",
         body: formData,
       });
-
+      
       if (!response.body) {
         throw new Error("ReadableStream not supported or no body in response");
       }
@@ -62,7 +62,9 @@ const VideoUploadAndStream = () => {
         buffer = newFrames.pop(); // Keep any incomplete frame in buffer
 
         newFrames.forEach((frame) => {
-          if (frame) setFrames((prev) => [...prev, frame]); // Accumulate frames
+          const parsed = JSON.parse(frame);
+         
+          if (parsed?.frame) setFrames((prev) => [...prev, parsed?.frame]); // Accumulate frames
         });
       }
       setIsLoading(false);
