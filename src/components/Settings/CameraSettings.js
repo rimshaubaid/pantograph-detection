@@ -96,13 +96,15 @@ const CameraSettings = () => {
         const widthStep = 320; // Step for width increments
         const heightStep = 128; // Step for height increments
   
-        for (let w = minWidth, h = minHeight; w <= width.max && h <= height.max; w += widthStep, h += heightStep) {
-          resolutions.push({
-            width: w,
-            height: h,
-            label: `${w}x${h}`,
-          });
-        }
+        // Start from the maximum width and height
+      for (let w = width.max, h = height.max; w >= minWidth && h >= minHeight; w -= widthStep, h -= heightStep) {
+        resolutions.push({
+          width: w,
+          height: h,
+          label: `${w}x${h}`,
+        });
+      }
+
   
         setAvailableResolutions(resolutions);
       }
