@@ -64,47 +64,53 @@ const CameraSettings = () => {
     getCameras();
   }, []);
 
-  const handleCameraChange = async (event) => {
-  
-    const selectedIndex = event.target.value; // Get the index of the selected camera
-   
+  const handleCameraChange = async (event,index) => {
+    console.log('i',index?.props?.value)
+    const selectedIndex = index?.props?.value; // Get the index of the selected camera
     const selectedCameraId = cameras[selectedIndex].deviceId;
     const selectedCamName = cameras[selectedIndex].label;
     setIntegerId(selectedIndex);
-    setCamera(selectedCameraId);
-
+    setCamera(event.target.value);
+  
     // Stop any existing video stream
     if (videoStream) {
       videoStream.getTracks().forEach((track) => track.stop());
     }
-
+  
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { deviceId: { exact: selectedCameraId } },
       });
       setVideoStream(stream);
-
+  
       // Get the video track from the stream and its capabilities
       const videoTrack = stream.getVideoTracks()[0];
       const capabilities = videoTrack.getCapabilities();
-
+  
       // Extract supported resolutions from capabilities
       const { width, height } = capabilities;
       if (width && height) {
         const resolutions = [];
-        for (let i = 0; i < width.max; i += 320) {
+        const minWidth = 320; // Start with 320 width
+        const minHeight = 128; // Start with 128 height
+        const widthStep = 320; // Step for width increments
+        const heightStep = 128; // Step for height increments
+  
+        for (let w = minWidth, h = minHeight; w <= width.max && h <= height.max; w += widthStep, h += heightStep) {
           resolutions.push({
-            width: width.min + i,
-            height: height.min + Math.floor((i * height.max) / width.max),
-            label: `${width.min + i}x${height.min + Math.floor((i * height.max) / width.max)}`,
+            width: w,
+            height: h,
+            label: `${w}x${h}`,
           });
         }
+  
         setAvailableResolutions(resolutions);
       }
     } catch (error) {
       console.error("Error accessing camera:", error);
     }
   };
+  
 
   const handleResolutionChange = async (event) => {
     const selectedResolution = availableResolutions.find(
