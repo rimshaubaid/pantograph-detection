@@ -111,6 +111,7 @@ const VideoUploadAndStream = () => {
           item.cp3 || "-",
           item.cp4 || "-",
           item.cp5 || "-",
+          item.frame_number || "-",
           item.inclination || "-",
           item.pantograph_height || "-",
           item.uplift_force || "-",
