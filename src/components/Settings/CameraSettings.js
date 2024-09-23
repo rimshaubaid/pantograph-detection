@@ -97,24 +97,31 @@ const CameraSettings = () => {
   
       // Extract supported resolutions from capabilities
       const { width, height } = capabilities;
+  
       if (width && height) {
         const resolutions = [];
         
-        // Use common width intervals like 320, 640, etc.
-        const commonWidths = [320, 640, 800, 1024, 1280]; // Add more resolutions if needed
-        
-        commonWidths.forEach((commonWidth) => {
-          if (commonWidth <= width.max && commonWidth >= width.min) {
-            const commonHeight = Math.floor((commonWidth * height.max) / width.max); // Maintain aspect ratio
-            if (commonHeight <= height.max && commonHeight >= height.min) {
-              resolutions.push({
-                width: commonWidth,
-                height: commonHeight,
-                label: `${commonWidth}x${commonHeight}`,
-              });
-            }
+        // Define the step size for generating resolutions
+        const step = 160;
+  
+        // Find the first width that is a multiple of 'step' and greater than or equal to width.min
+        let w = Math.ceil(width.min / step) * step;
+  
+        while (w <= width.max) {
+          const h = Math.floor((w * height.max) / width.max); // Maintain aspect ratio
+          
+          // Ensure the calculated height is within the supported range
+          if (h <= height.max && h >= height.min) {
+            resolutions.push({
+              width: w,
+              height: h,
+              label: `${w}x${h}`,
+            });
           }
-        });
+          
+          // Increment by the step size for the next resolution
+          w += step;
+        }
   
         setAvailableResolutions(resolutions);
         console.log('Available Resolutions:', resolutions);
@@ -123,6 +130,7 @@ const CameraSettings = () => {
       console.error("Error accessing camera:", error);
     }
   };
+  
   
 
 
