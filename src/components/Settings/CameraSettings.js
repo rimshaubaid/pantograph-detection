@@ -54,15 +54,24 @@ const CameraSettings = () => {
   useEffect(() => {
     const getCameras = async () => {
       try {
+        // Request camera/microphone permission
+        await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+  
+        // Once permission is granted, you can enumerate devices
         const devices = await navigator.mediaDevices.enumerateDevices();
+        console.log('Devices:', devices);
+  
+        // Filter out only the video input devices (cameras)
         const videoDevices = devices.filter((device) => device.kind === "videoinput");
         setCameras(videoDevices);
       } catch (error) {
         console.error("Error fetching camera devices.", error);
       }
     };
+  
     getCameras();
   }, []);
+  
 
   const handleCameraChange = async (event) => {
     const selectedCameraId = event.target.value;
