@@ -202,8 +202,8 @@ const VideoUploadAndStream = () => {
   }, [isPaused, frames]);
 
   return (
-    <Box sx={{ paddingTop: 10, paddingX: 5 }}>
-      <Typography variant="h1">Process Video</Typography>
+    <Box sx={{ paddingTop: 10, paddingX: 5,  backgroundColor: "#333", height:"100vh" }}>
+      <Typography variant="h1" color="white">Process Video</Typography>
       <Grid container >
         <Grid item xs={3}>
           <input type="file" accept="video/*" onChange={handleVideoUpload} />
@@ -213,10 +213,11 @@ const VideoUploadAndStream = () => {
           {frames.length > 0 && (
             <Box marginY={1}>
              
-               <Button variant="outlined" onClick={togglePause} sx={{marginRight:3}}>
+               <Button variant="outlined" onClick={togglePause} sx={{marginRight:3,background:"white"}}>
                 {isPaused ? "Resume" : "Pause"}
               </Button>
               {!isLoading && <Button
+              sx={{background:"white"}}
                 variant="outlined"
                 onClick={fetchData}
                 disabled={isVideoProcessing}
@@ -226,6 +227,7 @@ const VideoUploadAndStream = () => {
              {!isVideoProcessing  && <Button
                 variant="outlined"
                 onClick={saveVideo}
+                sx={{background:"white"}}
                 disabled={isVideoProcessing}
               >
                 Save Video
@@ -235,7 +237,7 @@ const VideoUploadAndStream = () => {
               )}
               {videoUrl && (
             <a href={videoUrl} download="processed_video.mp4">
-              <Button variant="contained" color="primary" sx={{marginLeft:3}}>
+              <Button variant="contained" color="primary" sx={{marginLeft:3,background:"white"}}>
                 Download Video
               </Button>
             </a>
@@ -246,13 +248,27 @@ const VideoUploadAndStream = () => {
       
       </Grid>
 
-      {frames.length > 0 && (
-        <img
-          src={`data:image/jpeg;base64,${frames[currentFrameIndex]}`}
-          alt="Stream frame"
-          style={{ width: "auto", height: "70vh" }} // Display the latest frame
-        />
-      )}
+      {frames.length > 0 ? (
+  <img
+    src={`data:image/jpeg;base64,${frames[currentFrameIndex]}`}
+    alt="Stream frame"
+    style={{ width: "auto", height: "70vh" }} // Display the latest frame
+  />
+) : (
+  <Box
+    sx={{
+      width: "50%",
+      height: "70vh",
+      border: "2px dashed red",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    }}
+  >
+   
+  </Box>
+)}
+
     </Box>
   );
 };
