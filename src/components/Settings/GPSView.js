@@ -59,6 +59,10 @@ const GPSSettings = () => {
 
 
   const handleSaveSettings = () => {
+    if(!gpsPort){
+      alert("Select GPS Port");
+      return;
+    }
     localStorage.setItem("gps_port",gpsPort);
     alert("GPS settings saved")
     // You can handle saving the GPS settings here (e.g., send them to the backend or apply them)
