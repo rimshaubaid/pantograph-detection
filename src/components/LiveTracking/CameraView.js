@@ -610,7 +610,9 @@ const CameraView = () => {
     if (!formValues.pantographModel) {
       errors.pantographModel = "This field is required";
     }
-
+    if (!formValues.pantographHeight) {
+      errors.pantographHeight = "This field is required";
+    }
     return errors;
   };
 
