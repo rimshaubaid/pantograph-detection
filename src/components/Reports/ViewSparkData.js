@@ -24,6 +24,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Checkbox
 } from "@mui/material";
 import { PhotoCamera } from "@mui/icons-material";
 import axios from "axios";
@@ -88,6 +89,16 @@ const SparkDataView = () => {
   const [reportType,setReportType] = useState("");
   const [fileType, setFileType] = useState("excel");
   const [data, setData] = useState([]); // State for storing API data
+  const [selectedRows, setSelectedRows] = useState([]);
+
+  const handleCheckboxChange = (id) => {
+    setSelectedRows((prevSelected) =>
+      prevSelected.includes(id)
+        ? prevSelected.filter((rowId) => rowId !== id) // Unselect row if already selected
+        : [...prevSelected, id] // Select row if not already selected
+    );
+  };
+   
   const handleDialogOpen =  (value) => {
     setReportType(value)
     setOpenDialog(true);
@@ -379,6 +390,7 @@ const SparkDataView = () => {
               <Table>
                 <TableHead>
                   <TableRow>
+                  <TableCell>Select</TableCell> {/* Add header for the checkbox */}
                     <TableCell>Id</TableCell>
                     <TableCell>Route</TableCell>
                     <TableCell>Section</TableCell>
@@ -400,6 +412,13 @@ const SparkDataView = () => {
                       .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((item) => (
                       <TableRow key={item.id}>
+                         <TableCell>
+                  <Checkbox
+                    checked={selectedRows.includes(item.id)}
+                    onChange={() => handleCheckboxChange(item.id)}
+                    color="primary"
+                  />
+                </TableCell>
                         <TableCell>{item.id}</TableCell>
                         <TableCell>{item.route}</TableCell>
                         <TableCell>{item.section}</TableCell>
