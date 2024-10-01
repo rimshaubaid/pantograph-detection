@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile } from "@ffmpeg/util";
-import { Box, Button, CircularProgress, Grid, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Grid, TextField, Typography } from "@mui/material";
 const apiUrl = process.env.REACT_APP_API_URL;
 const VideoUploadAndStream = () => {
   const [videoFile, setVideoFile] = useState(null);
@@ -13,7 +13,8 @@ const VideoUploadAndStream = () => {
   const [currentFrameIndex, setCurrentFrameIndex] = useState(0);
   const [ffmpegLoaded, setFfmpegLoaded] = useState(false);
   const ffmpeg = useRef(new FFmpeg()).current;
-
+ 
+  const [height,setHeight] = useState("");
   useEffect(() => {
     const loadFFmpeg = async () => {
       try {
@@ -28,15 +29,25 @@ const VideoUploadAndStream = () => {
   }, [ffmpeg]);
 
   const handleVideoUpload = (event) => {
+   
     if (event.target.files && event.target.files.length > 0) {
       setVideoFile(event.target.files[0]);
     }
   };
 
   const processVideo = async () => {
+    if(!height){
+      alert("Enter height");
+      return;
+    }
+    if(!videoFile){
+      alert("Upload video file");
+      return;
+    }
     setIsLoading(true);
     const formData = new FormData();
     formData.append("video", videoFile);
+    formData.append("initial_height_mm",height);
     let framesArray = []; // Array to accumulate frames
     try {
       const response = await fetch(`${apiUrl}/process-video`, {
@@ -76,7 +87,7 @@ const VideoUploadAndStream = () => {
      
     }
   };
-
+  
   const fetchData = async () => {
     try {
       const response = await fetch(`${apiUrl}/fetch_video_data`, {
@@ -183,11 +194,11 @@ const VideoUploadAndStream = () => {
     setIsPaused(!isPaused);
   };
 
-  useEffect(() => {
-    if (videoFile) {
-      processVideo();
-    }
-  }, [videoFile]);
+  // useEffect(() => {
+  //   if (videoFile) {
+  //     processVideo();
+  //   }
+  // }, [videoFile]);
 
   useEffect(() => {
     if (!isPaused && frames.length > 0) {
@@ -205,19 +216,21 @@ const VideoUploadAndStream = () => {
     <Box sx={{ paddingTop: 10, paddingX: 5,  backgroundColor: "#333", height:"100vh" }}>
       <Typography variant="h1" color="white">Process Video</Typography>
       <Grid container >
-        <Grid item xs={3}>
+        <Grid item xs={5} display="flex" sx={{mb:2}}>
           <input type="file" accept="video/*" onChange={handleVideoUpload} />
+          <TextField onChange={(e) => setHeight(e.target.value)} value={height} fullWidth placeholder="Enter height" />
+          <Button onClick={processVideo} variant="outlined" sx={{background:"white"}} >Submit</Button>
         </Grid>
-
-        <Grid item xs={5}>
+          
+        <Grid item xs={6} display="flex" justifyContent="flex-end">
           {frames.length > 0 && (
             <Box marginY={1}>
              
-               <Button variant="outlined" onClick={togglePause} sx={{marginRight:3,background:"white"}}>
+               <Button variant="outlined" onClick={togglePause} sx={{marginRight:3,marginLeft:4,background:"white"}}>
                 {isPaused ? "Resume" : "Pause"}
               </Button>
               {!isLoading && <Button
-              sx={{background:"white"}}
+              sx={{background:"white",marginRight:3}}
                 variant="outlined"
                 onClick={fetchData}
                 disabled={isVideoProcessing}
