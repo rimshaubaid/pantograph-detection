@@ -183,6 +183,10 @@ const CameraView = () => {
       }
     };
     getCameras();
+
+    return () => {
+      releaseCamera();
+    };
   }, []);
 
   useEffect(() => {
@@ -351,9 +355,15 @@ const CameraView = () => {
       frameRef.current.src = `data:image/jpeg;base64,${frameData.frame}`; // Convert the base64 frame to an image source
     }
   }, [frameData]);
+  const releaseCamera = async () => {
+    try {
+      
+      await axios.post(`${apiUrl}/release-camera`);
+    } catch (err) {}
+  };
 
-  
   const saveVideo = async () => {
+    releaseCamera();
     if (!ffmpegLoaded) {
       await ffmpeg.load();
     }
