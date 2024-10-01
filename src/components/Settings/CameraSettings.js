@@ -83,6 +83,7 @@ const CameraSettings = () => {
  // Cleanup function to stop the video stream on component unmount
  useEffect(() => {
   return () => {
+
     if (videoStream) {
       videoStream.getTracks().forEach((track) => track.stop());
     }

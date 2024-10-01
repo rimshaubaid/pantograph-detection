@@ -104,6 +104,37 @@ const CameraView = () => {
   const [gpsLang,setGPSLang] = useState(0);
   const [gpsLat,setGPSLat] = useState(0);
   useEffect(() => {
+    let mediaStream; // Declare mediaStream variable in the outer scope
+
+    // Function to turn off the camera if it's on
+    const turnOffCamera = async () => {
+      try {
+        // Get the media stream from the camera
+        mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+
+        // If the stream is active, stop all tracks (turn off camera)
+        if (mediaStream && mediaStream.active) {
+          mediaStream.getTracks().forEach(track => track.stop());
+          console.log("Camera turned off");
+        }
+      } catch (error) {
+        console.error("Error accessing camera devices.", error);
+      }
+    };
+
+    // Turn off the camera as soon as the component renders
+    turnOffCamera();
+
+    // Cleanup function to ensure the stream is always stopped on unmount
+    return () => {
+      if (mediaStream) {
+        mediaStream.getTracks().forEach(track => track.stop());
+        console.log("Camera stopped on component unmount");
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     getRouteData();
   }, []);
   const getRouteData = async () => {
