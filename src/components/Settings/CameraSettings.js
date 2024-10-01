@@ -180,6 +180,16 @@ const CameraSettings = () => {
  
 
   const save = () => {
+    if(!camera){
+      alert("Select camera");
+      return;
+    }
+    if(!resolution){
+      alert("Select resolution");
+      return;
+    }
+
+   
     localStorage.setItem("resolution", resolution);
     localStorage.setItem("deviceId",integerId)
     localStorage.setItem("camera_type", camera);
