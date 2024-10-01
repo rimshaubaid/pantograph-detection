@@ -13,7 +13,9 @@ import {
   TableHead
 } from '@mui/material';
 import axios from 'axios';
+import routeDataTemplate from '../../assets/template/RouteDataTemplate.xlsx';
 const apiUrl = process.env.REACT_APP_API_URL;
+
 const UploadRouteData = () => {
   const [fileName, setFileName] = useState('');
   const [file, setFile] = useState(null);
@@ -71,13 +73,38 @@ const UploadRouteData = () => {
     }
   };
 
+  const handleDownloadFile = () => {
+    // Create an anchor element and trigger the download
+    const link = document.createElement('a');
+    link.href = routeDataTemplate; // Use the imported file
+    link.setAttribute('download', 'RouteDataTemplate.xlsx'); // Name of the file for download
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link); // Clean up the anchor element after the click
+  };
+
+
+
   return (
     <Container maxWidth="lg" sx={{ paddingTop: 7 }}>
       <Paper sx={{ padding: 2, backgroundColor: '#333', color: '#fff' }}>
         <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
           Upload Route Data
         </Typography>
+        <Grid item xs={12} md={4} sx={{marginBottom:3}}>
+            <Button
+              variant="contained"
+              component="label"
+              sx={{ backgroundColor: '#008080' }}
+              onClick={handleDownloadFile}
+            >
+              Download Template File
+             
+            </Button>
+            
+          </Grid>
         <Grid container spacing={2} alignItems="center">
+          
           <Grid item xs={12} md={4}>
             <Button
               variant="contained"
@@ -106,7 +133,7 @@ const UploadRouteData = () => {
             </Button>
           </Grid>
         </Grid>
-        <TableContainer component={Paper} sx={{ marginTop: 2 , height:"60vh" , overflow:"auto" }}>
+        <TableContainer component={Paper} sx={{ marginTop: 2 , height:"55vh" , overflow:"auto" }}>
           <Table aria-label="simple table">
             <TableHead>
               <TableRow>
