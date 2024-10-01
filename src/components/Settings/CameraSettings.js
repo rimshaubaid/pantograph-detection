@@ -13,21 +13,21 @@ import {
   AccordionDetails,
   Dialog,
   DialogContent,
-  DialogTitle
+  DialogTitle,
 } from "@mui/material";
 import CameraAdvancedSettings from "./AdvancedSettings.js";
-import { VideocamOff , ExpandMore } from "@mui/icons-material";
+import { VideocamOff, ExpandMore } from "@mui/icons-material";
 import axios from "axios";
 const apiUrl = process.env.REACT_APP_API_URL;
 const CameraSettings = () => {
   const [cameras, setCameras] = useState([]);
   const [camera, setCamera] = useState("");
-  const [camName,setCamName] = useState("");
+  const [camName, setCamName] = useState("");
   const [resolution, setResolution] = useState("");
   const [availableResolutions, setAvailableResolutions] = useState([]);
   const [videoStream, setVideoStream] = useState(null);
   const [openSettingsDialog, setOpenSettingsDialog] = useState(false);
-  const [integerId,setIntegerId] = useState(0);
+  const [integerId, setIntegerId] = useState(0);
   // Function to handle opening the advanced settings dialog
   const handleOpenSettingsDialog = () => {
     setOpenSettingsDialog(true);
@@ -55,54 +55,71 @@ const CameraSettings = () => {
     const getCameras = async () => {
       try {
         // Request camera/microphone permission
-        await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-  
+        // Request camera/microphone permission
+      await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: false,
+        });
+    
+
         // Once permission is granted, you can enumerate devices
         const devices = await navigator.mediaDevices.enumerateDevices();
-        console.log('Devices:', devices);
-  
+        // console.log('Devices:', devices);
+
         // Filter out only the video input devices (cameras)
-        const videoDevices = devices.filter((device) => device.kind === "videoinput");
+        const videoDevices = devices.filter(
+          (device) => device.kind === "videoinput"
+        );
         setCameras(videoDevices);
       } catch (error) {
         console.error("Error fetching camera devices.", error);
       }
     };
-  
-    getCameras();
-  }, []);
-  
 
+    getCameras();
+
+   
+  }, []);
+ // Cleanup function to stop the video stream on component unmount
+ useEffect(() => {
+  return () => {
+    if (videoStream) {
+      videoStream.getTracks().forEach((track) => track.stop());
+    }
+  };
+}, [videoStream]);
   const handleCameraChange = async (event) => {
     const selectedCameraId = event.target.value;
-    const selectedIndex = cameras.findIndex((cam) => cam.deviceId === selectedCameraId); // Get the index of the selected camera
-    
+    const selectedIndex = cameras.findIndex(
+      (cam) => cam.deviceId === selectedCameraId
+    ); // Get the index of the selected camera
+
     setIntegerId(selectedIndex);
     setCamera(selectedCameraId);
-  
+
     // Stop any existing video stream
     if (videoStream) {
       videoStream.getTracks().forEach((track) => track.stop());
     }
-  
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { deviceId: { exact: selectedCameraId } },
       });
       setVideoStream(stream);
-  
+
       // Get the video track from the stream and its capabilities
       const videoTrack = stream.getVideoTracks()[0];
       const capabilities = videoTrack.getCapabilities();
-  
+
       // Extract supported resolutions from capabilities
       const { width, height } = capabilities;
-  
+
       if (width && height) {
         const resolutions = [];
         const step = 160;
         let w = Math.ceil(width.min / step) * step;
-  
+
         // Function to test if a resolution is supported
         const testResolution = async (w, h) => {
           try {
@@ -119,7 +136,7 @@ const CameraSettings = () => {
             return false; // Resolution is not supported
           }
         };
-  
+
         // Iterate over potential resolutions
         while (w <= width.max) {
           const h = Math.floor((w * height.max) / width.max); // Maintain aspect ratio
@@ -135,28 +152,25 @@ const CameraSettings = () => {
           }
           w += step; // Increment to the next resolution
         }
-  
+
         if (resolutions.length > 0) {
           setAvailableResolutions(resolutions);
-          console.log('Available Resolutions:', resolutions);
+          // console.log('Available Resolutions:', resolutions);
         } else {
-          console.log('No supported resolutions found.');
+          console.log("No supported resolutions found.");
         }
       }
     } catch (error) {
       console.error("Error accessing camera:", error);
     }
   };
-  
-  
-
 
   const handleResolutionChange = async (event) => {
     const selectedResolution = availableResolutions.find(
       (res) => res.label === event.target.value
     );
     setResolution(event.target.value);
- 
+
     if (camera && selectedResolution) {
       // Stop the current stream before changing resolution
       if (videoStream) {
@@ -176,22 +190,20 @@ const CameraSettings = () => {
         console.error("Error changing resolution:", error);
       }
     }
-  };  
- 
+  };
 
   const save = () => {
-    if(!camera){
+    if (!camera) {
       alert("Select camera");
       return;
     }
-    if(!resolution){
+    if (!resolution) {
       alert("Select resolution");
       return;
     }
 
-   
     localStorage.setItem("resolution", resolution);
-    localStorage.setItem("deviceId",integerId)
+    localStorage.setItem("deviceId", integerId);
     localStorage.setItem("camera_type", camera);
     alert("Camera settings saved");
   };
@@ -239,9 +251,12 @@ const CameraSettings = () => {
             onChange={handleCameraChange}
             sx={{ color: "#fff", fontWeight: "bold" }}
           >
-            {cameras.map((cam,index) => (
-              <MenuItem key={index}  value={cam.deviceId} // Value should be deviceId
-              data-index={index} >
+            {cameras.map((cam, index) => (
+              <MenuItem
+                key={index}
+                value={cam.deviceId} // Value should be deviceId
+                data-index={index}
+              >
                 {cam.label || `Camera ${cameras.indexOf(cam) + 1}`}
               </MenuItem>
             ))}
@@ -269,9 +284,13 @@ const CameraSettings = () => {
             ))}
           </Select>
         </FormControl>
-        <Button variant="contained" onClick={handleOpenSettingsDialog} sx={{marginRight:3}}>
-        Advanced Settings
-      </Button>
+        <Button
+          variant="contained"
+          onClick={handleOpenSettingsDialog}
+          sx={{ marginRight: 3 }}
+        >
+          Advanced Settings
+        </Button>
         <Button
           variant="contained"
           color="secondary"
@@ -281,7 +300,7 @@ const CameraSettings = () => {
           Save Camera Setting
         </Button>
       </Box>
-      
+
       <Box
         sx={{
           display: "flex",
@@ -330,8 +349,13 @@ const CameraSettings = () => {
           </Box>
         )}
       </Box>
-       {/* Dialog for Advanced Settings */}
-       <Dialog open={openSettingsDialog} onClose={handleCloseSettingsDialog} maxWidth="md" fullWidth>
+      {/* Dialog for Advanced Settings */}
+      <Dialog
+        open={openSettingsDialog}
+        onClose={handleCloseSettingsDialog}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>Advanced Camera Settings</DialogTitle>
         <DialogContent>
           {/* Pass the videoStream to the CameraAdvancedSettings component */}
