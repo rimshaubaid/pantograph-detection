@@ -451,13 +451,13 @@ const SparkDataView = () => {
                 >
                        <Typography style={{fontSize:"1vw"}}>Update Records</Typography>
                 </Button>
-                <Button
+                {/* <Button
                   variant="contained"
                   color="secondary"
                   onClick={handleDownload}
                 >
                   <Typography style={{fontSize:"1vw"}}>Download Report</Typography>
-                </Button>
+                </Button> */}
               </Box>
             </Box>
           </Paper>

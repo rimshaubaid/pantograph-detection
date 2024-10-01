@@ -76,7 +76,7 @@ const CameraSettings = () => {
   const handleCameraChange = async (event) => {
     const selectedCameraId = event.target.value;
     const selectedIndex = cameras.findIndex((cam) => cam.deviceId === selectedCameraId); // Get the index of the selected camera
-  
+    
     setIntegerId(selectedIndex);
     setCamera(selectedCameraId);
   
@@ -100,31 +100,48 @@ const CameraSettings = () => {
   
       if (width && height) {
         const resolutions = [];
-        
-        // Define the step size for generating resolutions
         const step = 160;
-  
-        // Find the first width that is a multiple of 'step' and greater than or equal to width.min
         let w = Math.ceil(width.min / step) * step;
   
+        // Function to test if a resolution is supported
+        const testResolution = async (w, h) => {
+          try {
+            const testStream = await navigator.mediaDevices.getUserMedia({
+              video: {
+                deviceId: { exact: selectedCameraId },
+                width: { exact: w },
+                height: { exact: h },
+              },
+            });
+            testStream.getTracks().forEach((track) => track.stop()); // Stop the test stream
+            return true;
+          } catch (error) {
+            return false; // Resolution is not supported
+          }
+        };
+  
+        // Iterate over potential resolutions
         while (w <= width.max) {
           const h = Math.floor((w * height.max) / width.max); // Maintain aspect ratio
-          
-          // Ensure the calculated height is within the supported range
           if (h <= height.max && h >= height.min) {
-            resolutions.push({
-              width: w,
-              height: h,
-              label: `${w}x${h}`,
-            });
+            const isSupported = await testResolution(w, h);
+            if (isSupported) {
+              resolutions.push({
+                width: w,
+                height: h,
+                label: `${w}x${h}`,
+              });
+            }
           }
-          
-          // Increment by the step size for the next resolution
-          w += step;
+          w += step; // Increment to the next resolution
         }
   
-        setAvailableResolutions(resolutions);
-        console.log('Available Resolutions:', resolutions);
+        if (resolutions.length > 0) {
+          setAvailableResolutions(resolutions);
+          console.log('Available Resolutions:', resolutions);
+        } else {
+          console.log('No supported resolutions found.');
+        }
       }
     } catch (error) {
       console.error("Error accessing camera:", error);
