@@ -148,7 +148,7 @@ const CameraSettings = () => {
     if (camera && selectedResolution) {
      //console.log('cca',camera,selectedResolution)
       // Stop the current stream before changing resolution
-      if (videoStream) {xw
+      if (videoStream) {
         videoStream.getTracks().forEach((track) => track.stop());
       }
 
