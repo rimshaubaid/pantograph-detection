@@ -78,8 +78,16 @@ const CameraSettings = () => {
 
     getCameras();
 
-   
+    return () => {
+      releaseCamera();
+    };
   }, []);
+  const releaseCamera = async () => {
+    try {
+      
+      await axios.post(`${apiUrl}/release-camera`);
+    } catch (err) {}
+  };
  // Cleanup function to stop the video stream on component unmount
  useEffect(() => {
   return () => {

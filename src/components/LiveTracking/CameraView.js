@@ -43,11 +43,14 @@ import {
   SwapHoriz,
 } from "@mui/icons-material";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate , useBeforeUnload } from "react-router-dom";
 let framesArray = [];
 const apiUrl = process.env.REACT_APP_API_URL;
 const CameraView = () => {
+  
+  
   const navigate = useNavigate();
+
   const [cameraError, setCameraError] = useState(null);
   const [currentDateTime, setCurrentDateTime] = useState("");
   const [isNightMode, setIsNightMode] = useState(true);
@@ -133,7 +136,24 @@ const CameraView = () => {
       }
     };
   }, []);
+  useEffect(() => {
+    const handlePageHide = (event) => {
 
+      event.returnValue = 'You have unsaved changes, are you sure you want to leave?';
+      // if (isRecording && !isPaused) {
+      //   event.preventDefault();
+      //   event.returnValue = ""; // Standard way to show the browser's confirmation dialog
+      //   handleNavigationAttempt()
+      // }
+    };
+   
+    window.addEventListener('pagehide', handlePageHide);
+
+    return () => {
+
+      window.removeEventListener('pagehide', handlePageHide);
+    };
+  }, []);
   useEffect(() => {
     getRouteData();
   }, []);
@@ -259,6 +279,8 @@ const CameraView = () => {
       setGpsPort(gps);
     }
   }, []);
+  
+
 
   const getGPSDevices = async () => {
     try {
@@ -374,7 +396,7 @@ const CameraView = () => {
     if (!isPaused) {
       const intervalId = setInterval(() => {
         fetchFrame();
-      }, 100); // Fetch the frame every second
+      }, 60); // Fetch the frame every second
 
       return () => clearInterval(intervalId); // Cleanup on component unmount or if paused
     }
@@ -437,20 +459,7 @@ const CameraView = () => {
     navigate("/");
   };
 
-  useEffect(() => {
-    const handleBeforeUnload = (event) => {
-      if (isRecording && !isPaused) {
-        event.preventDefault();
-        event.returnValue = ""; // Standard way to show the browser's confirmation dialog
-      }
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, [isRecording, isPaused]);
+ 
 
   const handleNavigationAttempt = () => {
     if (isRecording && !isPaused) {

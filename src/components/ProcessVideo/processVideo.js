@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile } from "@ffmpeg/util";
-import { Box, Button, CircularProgress, Grid, TextField, Typography } from "@mui/material";
+import { UploadFile } from "@mui/icons-material";
+import { Box, Button, CircularProgress, Grid, TextField, Typography,IconButton } from "@mui/material";
 const apiUrl = process.env.REACT_APP_API_URL;
 const VideoUploadAndStream = () => {
   const [videoFile, setVideoFile] = useState(null);
@@ -217,9 +218,25 @@ const VideoUploadAndStream = () => {
       <Typography variant="h1" color="white">Process Video</Typography>
       <Grid container >
         <Grid item xs={5} display="flex" sx={{mb:2}}>
-          <input type="file" accept="video/*" onChange={handleVideoUpload} />
+        <input
+        accept="video/*"
+        style={{ display: 'none' }} // Hide the default input field
+        id="video-upload"
+        type="file"
+        onChange={handleVideoUpload}
+      />
+      <label htmlFor="video-upload">
+        <IconButton color="primary" aria-label="upload video" component="span">
+          <UploadFile />
+        </IconButton>
+      </label>
+      {videoFile && (
+        <Typography variant="body2" sx={{ mt: 1,color:"white" }}>
+          Uploaded: {videoFile?.name}
+        </Typography>
+      )}
           <TextField onChange={(e) => setHeight(e.target.value)} value={height} fullWidth placeholder="Enter height" />
-          <Button onClick={processVideo} variant="outlined" sx={{background:"white"}} >Submit</Button>
+          <Button onClick={processVideo} variant="outlined" sx={{background:"white",marginLeft:4,textTransform:"none"}} >Submit</Button>
         </Grid>
           
         <Grid item xs={6} display="flex" justifyContent="flex-end">
