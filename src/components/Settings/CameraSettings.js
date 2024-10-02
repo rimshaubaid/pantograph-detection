@@ -110,22 +110,7 @@ const CameraSettings = () => {
       setAvailableResolutions(response)
     }
 
-    // Stop any existing video stream
-    if (videoStream) {
-      videoStream.getTracks().forEach((track) => track.stop());
-    }
-
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { deviceId: { exact: selectedCameraId } },
-      });
-      setVideoStream(stream);
-
-     
-    
-    } catch (error) {
-      console.error("Error accessing camera:", error);
-    }
+  
   };
 
   const getCameraResolutions = async (cameraIndex) => {
@@ -163,7 +148,7 @@ const CameraSettings = () => {
     if (camera && selectedResolution) {
      //console.log('cca',camera,selectedResolution)
       // Stop the current stream before changing resolution
-      if (videoStream) {
+      if (videoStream) {xw
         videoStream.getTracks().forEach((track) => track.stop());
       }
 
