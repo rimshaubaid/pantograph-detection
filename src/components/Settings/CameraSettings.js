@@ -105,6 +105,10 @@ const CameraSettings = () => {
 
     setIntegerId(selectedIndex);
     setCamera(selectedCameraId);
+    const response = await getCameraResolutions(selectedIndex);
+    if(response){
+      setAvailableResolutions(response)
+    }
 
     // Stop any existing video stream
     if (videoStream) {
@@ -117,62 +121,38 @@ const CameraSettings = () => {
       });
       setVideoStream(stream);
 
-      // Get the video track from the stream and its capabilities
-      const videoTrack = stream.getVideoTracks()[0];
-      const capabilities = videoTrack.getCapabilities();
-
-      // Extract supported resolutions from capabilities
-      const { width, height } = capabilities;
-
-      if (width && height) {
-        const resolutions = [];
-        const step = 160;
-        let w = Math.ceil(width.min / step) * step;
-
-        // Function to test if a resolution is supported
-        const testResolution = async (w, h) => {
-          try {
-            const testStream = await navigator.mediaDevices.getUserMedia({
-              video: {
-                deviceId: { exact: selectedCameraId },
-                width: { exact: w },
-                height: { exact: h },
-              },
-            });
-            testStream.getTracks().forEach((track) => track.stop()); // Stop the test stream
-            return true;
-          } catch (error) {
-            return false; // Resolution is not supported
-          }
-        };
-
-        // Iterate over potential resolutions
-        while (w <= width.max) {
-          const h = Math.floor((w * height.max) / width.max); // Maintain aspect ratio
-          if (h <= height.max && h >= height.min) {
-            const isSupported = await testResolution(w, h);
-            if (isSupported) {
-              resolutions.push({
-                width: w,
-                height: h,
-                label: `${w}x${h}`,
-              });
-            }
-          }
-          w += step; // Increment to the next resolution
-        }
-
-        if (resolutions.length > 0) {
-          setAvailableResolutions(resolutions);
-          // console.log('Available Resolutions:', resolutions);
-        } else {
-          console.log("No supported resolutions found.");
-        }
-      }
+     
+    
     } catch (error) {
       console.error("Error accessing camera:", error);
     }
   };
+
+  const getCameraResolutions = async (cameraIndex) => {
+    try {
+      const response = await axios.get(`${apiUrl}/get_resolutions`, {
+        params: { camera_index: cameraIndex },
+      });
+  
+ 
+      
+      // Transform working_resolutions into an array of objects
+      const resolutions = response.data.working_resolutions.map(resolution => {
+        const width = resolution[0];
+        const height = resolution[1];
+        const label = `${width}x${height}`; // Format as '640x480'
+  
+        return { width, height, label }; // Return as an object
+      });
+  
+      return resolutions; // Return the array of resolution objects
+    } catch (error) {
+      console.error('Error fetching camera resolutions:', error);
+      return []; // Return an empty array in case of an error
+    }
+  };
+  
+  
 
   const handleResolutionChange = async (event) => {
     const selectedResolution = availableResolutions.find(
@@ -181,6 +161,7 @@ const CameraSettings = () => {
     setResolution(event.target.value);
 
     if (camera && selectedResolution) {
+     //console.log('cca',camera,selectedResolution)
       // Stop the current stream before changing resolution
       if (videoStream) {
         videoStream.getTracks().forEach((track) => track.stop());
