@@ -1,38 +1,46 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useCallback, useContext, useEffect } from 'react';
+import { UNSAFE_NavigationContext as NavigationContext } from 'react-router-dom';
 
-const usePrompt = (when, message) => {
-  const navigate = useNavigate();
+function useConfirmExit(confirmExit, when = true) {
+  const { navigator } = useContext(NavigationContext);
 
   useEffect(() => {
-    const handleBeforeUnload = (event) => {
-      if (when) {
-        event.preventDefault();
-        event.returnValue = message; // For older browsers
+    if (!when) {
+      return;
+    }
+
+    const push = navigator.push;
+
+    navigator.push = (...args) => {
+      const result = confirmExit();
+      if (result !== false) {
+        push(...args);
       }
     };
 
-    const handleRouteChange = (event) => {
-      if (when) {
-        const confirmLeave = window.confirm(message);
-        if (!confirmLeave) {
-          event.preventDefault();
-        }
-      }
-    };
-
-    // Listen for the beforeunload event
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
-    // Add event listener for navigation
-    window.addEventListener('popstate', handleRouteChange);
-
-    // Cleanup
     return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      window.removeEventListener('popstate', handleRouteChange);
+      navigator.push = push;
     };
-  }, [when, message, navigate]);
-};
+  }, [navigator, confirmExit, when]);
+}
 
-export default usePrompt;
+export function usePrompt(message, when = true) {
+  useEffect(() => {
+    if (when) {
+      window.onbeforeunload = function () {
+        return message;
+      };
+    }
+
+    return () => {
+      window.onbeforeunload = null;
+    };
+  }, [message, when]);
+
+  const confirmExit = useCallback(() => {
+    const confirm = window.confirm(message);
+    return confirm;
+  }, [message]);
+
+  useConfirmExit(confirmExit, when);
+}

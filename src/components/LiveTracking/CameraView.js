@@ -43,12 +43,13 @@ import {
   SwapHoriz,
 } from "@mui/icons-material";
 
-import { useNavigate , useBeforeUnload } from "react-router-dom";
+import { usePrompt } from "../usePrompt.js";
+import { useNavigate  } from "react-router-dom";
 let framesArray = [];
 const apiUrl = process.env.REACT_APP_API_URL;
 const CameraView = () => {
   
-  
+
   const navigate = useNavigate();
 
   const [cameraError, setCameraError] = useState(null);
@@ -83,10 +84,13 @@ const CameraView = () => {
     weather: "",
     temperature: "",
   });
+    // Using the usePrompt hook to show a confirmation dialog
+   usePrompt('You have unsaved changes, are you sure you want to leave?', true);
   const [formErrors, setFormErrors] = useState({});
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [currentFrame, setCurrentFrame] = useState(null);
   const videoRef = useRef(null);
+  const [isDirty,setDirty] = useState(false);
   const frameRef = useRef(null);
   const canvasRef = useRef(null);
   const [isStreaming, setIsStreaming] = useState(false);
@@ -136,24 +140,27 @@ const CameraView = () => {
       }
     };
   }, []);
+
   useEffect(() => {
-    const handlePageHide = (event) => {
+    setDirty(true);
+  },[navigate])
+  // useEffect(() => {
+  //   const handleBeforeUnload = (event) => {
+  //     console.log('here!!')
+  //     // Cancel the event
+  //     event.preventDefault();
+  //     // Chrome requires returnValue to be set
+  //     event.returnValue = '';
+  //   };
 
-      event.returnValue = 'You have unsaved changes, are you sure you want to leave?';
-      // if (isRecording && !isPaused) {
-      //   event.preventDefault();
-      //   event.returnValue = ""; // Standard way to show the browser's confirmation dialog
-      //   handleNavigationAttempt()
-      // }
-    };
-   
-    window.addEventListener('pagehide', handlePageHide);
+  //   window.addEventListener('beforeunload', handleBeforeUnload);
 
-    return () => {
-
-      window.removeEventListener('pagehide', handlePageHide);
-    };
-  }, []);
+  //   return () => {
+  //     // Cleanup
+  //     window.removeEventListener('beforeunload', handleBeforeUnload);
+  //   };
+  // }, []);
+  
   useEffect(() => {
     getRouteData();
   }, []);
@@ -675,6 +682,25 @@ const CameraView = () => {
         overflow: "hidden",
       }}
     >
+      
+      <Dialog
+        open={openNavigateDialog}
+        onClose={() => setOpenNavigateDialog(false)}
+      >
+        <DialogTitle>Leave Page</DialogTitle>
+        <DialogContent>
+          Recording will be paused if you leave this page. Are you sure you want
+          to leave?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenNavigateDialog(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={confirmNavigation} color="primary">
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Dialog
         open={openModal}
         onClose={(event, reason) => {
@@ -1478,24 +1504,7 @@ const CameraView = () => {
         </DialogActions>
       </Dialog>
 
-      <Dialog
-        open={openNavigateDialog}
-        onClose={() => setOpenNavigateDialog(false)}
-      >
-        <DialogTitle>Leave Page</DialogTitle>
-        <DialogContent>
-          Recording will be paused if you leave this page. Are you sure you want
-          to leave?
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenNavigateDialog(false)} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={confirmNavigation} color="primary">
-            Confirm
-          </Button>
-        </DialogActions>
-      </Dialog>
+     
     </Box>
   );
 };
