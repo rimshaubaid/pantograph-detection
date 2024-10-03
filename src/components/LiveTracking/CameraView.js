@@ -230,6 +230,7 @@ const CameraView = () => {
       }
     }
   };
+  
   // Fetch the list of connected cameras
   useEffect(() => {
     const getCameras = async () => {
@@ -636,16 +637,40 @@ const CameraView = () => {
     return () => clearInterval(intervalId);
   }, [isPaused,isRecording,openModal]);
 
-
   const startVideo = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      // Check if "camera_type" and "resolution" exist in localStorage
+      const storedCameraId = localStorage.getItem("camera_type");
+      const storedResolution = localStorage.getItem("resolution");
+  
+      // Set default resolution to 640x480 if none is stored
+      const [defaultWidth, defaultHeight] = storedResolution 
+        ? storedResolution.split('x') 
+        : [640, 480];
+   
+      // Set up constraints for getUserMedia
+      let constraints = {
+        video: {
+          width: { exact: parseInt(defaultWidth) },
+          height: { exact: parseInt(defaultHeight) },
+        }
+      };
+  
+      if (storedCameraId) {
+        // If a specific camera is stored, add it to the constraints
+        constraints.video.deviceId = { exact: storedCameraId };
+      }
+  
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+  
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-
+  
         // Ensure play() is called only once the video is ready
         videoRef.current.onloadedmetadata = () => {
-          videoRef.current.play().catch(error => console.error('Error playing video:', error));
+          videoRef.current.play().catch((error) => {
+            console.error('Error playing video:', error);
+          });
         };
       }
     } catch (error) {
