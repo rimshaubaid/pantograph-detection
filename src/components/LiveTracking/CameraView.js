@@ -110,36 +110,36 @@ const CameraView = () => {
   const [routeData, setRouteData] = useState([]);
   const [gpsLang,setGPSLang] = useState(0);
   const [gpsLat,setGPSLat] = useState(0);
-  // useEffect(() => {
-  //   let mediaStream; // Declare mediaStream variable in the outer scope
+  useEffect(() => {
+    let mediaStream; // Declare mediaStream variable in the outer scope
 
-  //   // Function to turn off the camera if it's on
-  //   const turnOffCamera = async () => {
-  //     try {
-  //       // Get the media stream from the camera
-  //       mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    // Function to turn off the camera if it's on
+    const turnOffCamera = async () => {
+      try {
+        // Get the media stream from the camera
+        mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
 
-  //       // If the stream is active, stop all tracks (turn off camera)
-  //       if (mediaStream && mediaStream.active) {
-  //         mediaStream.getTracks().forEach(track => track.stop());
-  //         console.log("Camera turned off");
-  //       }
-  //     } catch (error) {
-  //       console.error("Error accessing camera devices.", error);
-  //     }
-  //   };
+        // If the stream is active, stop all tracks (turn off camera)
+        if (mediaStream && mediaStream.active) {
+          mediaStream.getTracks().forEach(track => track.stop());
+          console.log("Camera turned off");
+        }
+      } catch (error) {
+        console.error("Error accessing camera devices.", error);
+      }
+    };
 
-  //   // Turn off the camera as soon as the component renders
-  //   turnOffCamera();
+    // Turn off the camera as soon as the component renders
+    turnOffCamera();
 
-  //   // Cleanup function to ensure the stream is always stopped on unmount
-  //   return () => {
-  //     if (mediaStream) {
-  //       mediaStream.getTracks().forEach(track => track.stop());
-  //       console.log("Camera stopped on component unmount");
-  //     }
-  //   };
-  // }, []);
+    // Cleanup function to ensure the stream is always stopped on unmount
+    return () => {
+      if (mediaStream) {
+        mediaStream.getTracks().forEach(track => track.stop());
+        console.log("Camera stopped on component unmount");
+      }
+    };
+  }, []);
 
   useEffect(() => {
     setDirty(true);
@@ -232,37 +232,37 @@ const CameraView = () => {
   };
   
   // Fetch the list of connected cameras
-  useEffect(() => {
-    const getCameras = async () => {
-      try {
-        const devices = await navigator.mediaDevices.enumerateDevices();
-        const videoDevices = devices.filter((device) => device.kind === "videoinput");
-        setCameras(videoDevices);
-      } catch (error) {
-        console.error("Error fetching camera devices.", error);
-      }
-    };
-    getCameras();
+  // useEffect(() => {
+  //   const getCameras = async () => {
+  //     try {
+  //       const devices = await navigator.mediaDevices.enumerateDevices();
+  //       const videoDevices = devices.filter((device) => device.kind === "videoinput");
+  //       setCameras(videoDevices);
+  //     } catch (error) {
+  //       console.error("Error fetching camera devices.", error);
+  //     }
+  //   };
+  //   getCameras();
 
   
-  }, []);
+  // }, []);
 
-  useEffect(() => {
-    //if camera isnt selected
-    const cam = localStorage.getItem("deviceId");
-    const res = localStorage.getItem("resolution");
+  // useEffect(() => {
+  //   //if camera isnt selected
+  //   const cam = localStorage.getItem("deviceId");
+  //   const res = localStorage.getItem("resolution");
     
-    if (!cam) {
-      setSelectedCamera(0);
-    } else {
-      setSelectedCamera(cam);
-    }
-    if (res) {
-      setSelectedResolution(res);
-    } else {
-      setSelectedResolution("640x480");
-    }
-  }, []);
+  //   if (!cam) {
+  //     setSelectedCamera(0);
+  //   } else {
+  //     setSelectedCamera(cam);
+  //   }
+  //   if (res) {
+  //     setSelectedResolution(res);
+  //   } else {
+  //     setSelectedResolution("640x480");
+  //   }
+  // }, []);
 
   // useEffect(() => {
   //   // Fetch the list of connected cameras
