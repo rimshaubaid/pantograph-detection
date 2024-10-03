@@ -110,36 +110,36 @@ const CameraView = () => {
   const [routeData, setRouteData] = useState([]);
   const [gpsLang,setGPSLang] = useState(0);
   const [gpsLat,setGPSLat] = useState(0);
-  useEffect(() => {
-    let mediaStream; // Declare mediaStream variable in the outer scope
+  // useEffect(() => {
+  //   let mediaStream; // Declare mediaStream variable in the outer scope
 
-    // Function to turn off the camera if it's on
-    const turnOffCamera = async () => {
-      try {
-        // Get the media stream from the camera
-        mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+  //   // Function to turn off the camera if it's on
+  //   const turnOffCamera = async () => {
+  //     try {
+  //       // Get the media stream from the camera
+  //       mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
 
-        // If the stream is active, stop all tracks (turn off camera)
-        if (mediaStream && mediaStream.active) {
-          mediaStream.getTracks().forEach(track => track.stop());
-          console.log("Camera turned off");
-        }
-      } catch (error) {
-        console.error("Error accessing camera devices.", error);
-      }
-    };
+  //       // If the stream is active, stop all tracks (turn off camera)
+  //       if (mediaStream && mediaStream.active) {
+  //         mediaStream.getTracks().forEach(track => track.stop());
+  //         console.log("Camera turned off");
+  //       }
+  //     } catch (error) {
+  //       console.error("Error accessing camera devices.", error);
+  //     }
+  //   };
 
-    // Turn off the camera as soon as the component renders
-    turnOffCamera();
+  //   // Turn off the camera as soon as the component renders
+  //   turnOffCamera();
 
-    // Cleanup function to ensure the stream is always stopped on unmount
-    return () => {
-      if (mediaStream) {
-        mediaStream.getTracks().forEach(track => track.stop());
-        console.log("Camera stopped on component unmount");
-      }
-    };
-  }, []);
+  //   // Cleanup function to ensure the stream is always stopped on unmount
+  //   return () => {
+  //     if (mediaStream) {
+  //       mediaStream.getTracks().forEach(track => track.stop());
+  //       console.log("Camera stopped on component unmount");
+  //     }
+  //   };
+  // }, []);
 
   useEffect(() => {
     setDirty(true);
@@ -223,6 +223,7 @@ const CameraView = () => {
         });
 
         setOpenModal(false);
+        startVideo();
       } catch (error) {
         // Handle any errors that occur during the API call
         console.error("Error submitting form:", error);
@@ -242,9 +243,7 @@ const CameraView = () => {
     };
     getCameras();
 
-    return () => {
-      releaseCamera();
-    };
+  
   }, []);
 
   useEffect(() => {
@@ -364,57 +363,57 @@ const CameraView = () => {
   // }, [currentFrame]);
   const [frameData, setFrameData] = useState(null); // State to hold the frame data
 
-  useEffect(() => {
-    if(!formValues.route){
-      return;
-    }
-    if(selectedCamera === null){
-      return;
-    }
-    const fetchFrame = async () => {
-      try {
-        const response = await fetch(
-          `${apiUrl}/process-camera-feed?camera_type=${selectedCamera}&resolution=${selectedResolution}&route=${formValues.route}`
-        );
-        const data = await response.json(); // Parse JSON response
+  // useEffect(() => {
+  //   if(!formValues.route){
+  //     return;
+  //   }
+  //   if(selectedCamera === null){
+  //     return;
+  //   }
+  //   const fetchFrame = async () => {
+  //     try {
+  //       const response = await fetch(
+  //         `${apiUrl}/process-camera-feed?camera_type=${selectedCamera}&resolution=${selectedResolution}&route=${formValues.route}`
+  //       );
+  //       const data = await response.json(); // Parse JSON response
 
-        if (data?.frame) {
+  //       if (data?.frame) {
           
-          setFrameData(data); // Save the entire data, including the frame
-           // Update other pieces of information
-          framesArray.push(data?.frame);
-          setContactPoints(data.contact_points);
-          setHeight(data.pantograph_height);
-          setLang(data.longitude);
-          setLat(data.latitude);
-          setCurrLocation(data.current_location);
-          setPrevLocation(data.previous_location);
-          setNextLocation(data.next_location);
-          setPrevDistance(data.previous_distance);
-          setNextDistance(data.next_distance);
-          setSpeed(data.speed_kmh);
-        }
-      } catch (error) {
-        console.error('Error fetching the camera feed:', error);
-      }
-    };
+  //         setFrameData(data); // Save the entire data, including the frame
+  //          // Update other pieces of information
+  //         framesArray.push(data?.frame);
+  //         setContactPoints(data.contact_points);
+  //         setHeight(data.pantograph_height);
+  //         setLang(data.longitude);
+  //         setLat(data.latitude);
+  //         setCurrLocation(data.current_location);
+  //         setPrevLocation(data.previous_location);
+  //         setNextLocation(data.next_location);
+  //         setPrevDistance(data.previous_distance);
+  //         setNextDistance(data.next_distance);
+  //         setSpeed(data.speed_kmh);
+  //       }
+  //     } catch (error) {
+  //       console.error('Error fetching the camera feed:', error);
+  //     }
+  //   };
 
-    // Only fetch frames if the feed is not paused
-    if (!isPaused) {
-      const intervalId = setInterval(() => {
-        fetchFrame();
-      }, 60); // Fetch the frame every second
+  //   // Only fetch frames if the feed is not paused
+  //   if (!isPaused) {
+  //     const intervalId = setInterval(() => {
+  //       fetchFrame();
+  //     }, 60); // Fetch the frame every second
 
-      return () => clearInterval(intervalId); // Cleanup on component unmount or if paused
-    }
-  }, [openModal, isPaused]);
+  //     return () => clearInterval(intervalId); // Cleanup on component unmount or if paused
+  //   }
+  // }, [openModal, isPaused]);
 
-  useEffect(() => {
-    // When frameData is updated, update the img source
-    if (frameData?.frame && frameRef.current) {
-      frameRef.current.src = `data:image/jpeg;base64,${frameData.frame}`; // Convert the base64 frame to an image source
-    }
-  }, [frameData]);
+  // useEffect(() => {
+  //   // When frameData is updated, update the img source
+  //   if (frameData?.frame && frameRef.current) {
+  //     frameRef.current.src = `data:image/jpeg;base64,${frameData.frame}`; // Convert the base64 frame to an image source
+  //   }
+  // }, [frameData]);
   const releaseCamera = async () => {
     try {
       
@@ -539,115 +538,132 @@ const CameraView = () => {
     }));
   };
 
-  // const captureFrame = async () => {
-  //   if (videoRef.current && canvasRef.current) {
-  //     const canvas = canvasRef.current;
-  //     const context = canvas.getContext("2d");
-  //     const video = videoRef.current;
+  const captureFrame = async () => {
+    // if(!formValues.route){
+    //   return;
+    // }
+    if (videoRef.current && canvasRef.current) {
+      const canvas = canvasRef.current;
+      const context = canvas.getContext("2d");
+      const video = videoRef.current;
 
-  //     canvas.width = video.videoWidth;
-  //     canvas.height = video.videoHeight;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
 
-  //     context.drawImage(video, 0, 0, canvas.width, canvas.height);
-  //     const base64Image = canvas.toDataURL("image/jpeg");
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const base64Image = canvas.toDataURL("image/jpeg");
 
-  //     // Remove the prefix from base64 string
-  //     const base64Data = base64Image.replace(/^data:image\/jpeg;base64,/, "");
+      // Remove the prefix from base64 string
+      const base64Data = base64Image.replace(/^data:image\/jpeg;base64,/, "");
+   
+      // // Send base64 frame to backend
+      try {
+        const response = await fetch(
+          `http://127.0.0.1:5000/process-camera-feed?route=${formValues.route}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json", // Set content type as JSON
+            },
+             body: JSON.stringify({ frame: base64Data }), // Serialize the body
+          }
+        );
 
-  //     // // Send base64 frame to backend
-  //     try {
-  //       const response = await fetch(
-  //         "http://81.208.170.168:5100/process-camera-feed",
-  //         {
-  //           method: "POST",
-  //           // headers: {
-  //           //   "Content-Type": "application/json", // Set content type as JSON
-  //           // },
-  //           // body: JSON.stringify({ frame: base64Data }), // Serialize the body
-  //         }
-  //       );
+        if (!response.body) {
+          throw new Error(
+            "ReadableStream not supported or no body in response"
+          );
+        }
 
-  //       if (!response.body) {
-  //         throw new Error(
-  //           "ReadableStream not supported or no body in response"
-  //         );
-  //       }
+        const reader = response.body.getReader();
 
-  //       const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
 
-  //       const decoder = new TextDecoder();
-  //       let buffer = "";
+        // Process the stream
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
 
-  //       // Process the stream
-  //       while (true) {
-  //         const { done, value } = await reader.read();
-  //         if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+   
+          // Split buffer by newlines to get frames
+          // const frames = buffer.split("\n");
+          // buffer = frames.pop(); // Keep any incomplete frame in buffer
+  
+       
+              try {
+               
+                const parsedFrame = JSON.parse(buffer); // Parse the frame as JSON
+                
+                if (parsedFrame.frame) {
+                  framesArray.push(parsedFrame.frame);
+                  setFrames(parsedFrame.frame); // Update state with new frame
+                  setContactPoints(parsedFrame?.contact_points);
+                 setHeight(parsedFrame?.pantograph_height);
+                 setContactPoints(parsedFrame?.contact_points);
+            
+                         setLang(parsedFrame?.longitude);
+                          setLat(parsedFrame?.latitude);
+                         setCurrLocation(parsedFrame?.current_location);
+                          setPrevLocation(parsedFrame?.previous_location);
+                          setNextLocation(parsedFrame?.next_location);
+                          setPrevDistance(parsedFrame?.previous_distance);
+                          setNextDistance(parsedFrame?.next_distance);
+                          setSpeed(parsedFrame?.speed_kmh);
+                }
+              } catch (error) {
+                console.error("Error parsing frame:", error);
+              }
+            
+        
+        }
+      } catch (error) {
+        console.error("Error sending frame to backend:", error);
+      }
+    }
+  };
 
-  //         buffer += decoder.decode(value, { stream: true });
-  //         // console.log('buffer',buffer)
-  //         // Split buffer by newlines to get frames
-  //         const frames = buffer.split("\n");
-  //         buffer = frames.pop(); // Keep any incomplete frame in buffer
+  useEffect(() => {
+    let intervalId;
+    if(!formValues.route && openModal){
+      return;
+    }
+    if(!isPaused && formValues.route ){
+      intervalId = setInterval(captureFrame, 100); // Capture frame every 1 second
+    }
 
-  //         frames.forEach((frame) => {
-  //           if (frame) {
-  //             try {
-  //               const parsedFrame = JSON.parse(frame); // Parse the frame as JSON
-  //               if (parsedFrame.processed_frame) {
-  //                 framesArray.push(parsedFrame.processed_frame);
-  //                 setFrames(parsedFrame.processed_frame); // Update state with new frame
-  //                 setContactPoints(parsedFrame?.contact_points);
-  //                 setHeight(parsedFrame?.pantograph_height);
-  //               }
-  //             } catch (error) {
-  //               console.error("Error parsing frame:", error);
-  //             }
-  //           }
-  //         });
-  //       }
-  //     } catch (error) {
-  //       console.error("Error sending frame to backend:", error);
-  //     }
-  //   }
-  // };
-  //console.log('f',fram)
-  // useEffect(() => {
-  //   let intervalId;
-  //   if(!isPaused){
-  //     intervalId = setInterval(captureFrame, 1000); // Capture frame every 1 second
-  //   }
+    return () => clearInterval(intervalId);
+  }, [isPaused,isRecording,openModal]);
 
-  //   return () => clearInterval(intervalId);
-  // }, [isPaused,isRecording]);
 
-  // useEffect(() => {
-  //   const startVideo = async () => {
-  //     try {
-  //       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-  //       if (videoRef.current) {
-  //         videoRef.current.srcObject = stream;
+  const startVideo = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
 
-  //         // Ensure play() is called only once the video is ready
-  //         videoRef.current.onloadedmetadata = () => {
-  //           videoRef.current.play().catch(error => console.error('Error playing video:', error));
-  //         };
-  //       }
-  //     } catch (error) {
-  //       console.error('Error accessing user media:', error);
-  //     }
-  //   };
+        // Ensure play() is called only once the video is ready
+        videoRef.current.onloadedmetadata = () => {
+          videoRef.current.play().catch(error => console.error('Error playing video:', error));
+        };
+      }
+    } catch (error) {
+      console.error('Error accessing user media:', error);
+    }
+  };
 
-  //   startVideo();
+  useEffect(() => {
 
-  //   return () => {
-  //     if (videoRef.current) {
-  //       const stream = videoRef.current.srcObject;
-  //       if (stream) {
-  //         stream.getTracks().forEach(track => track.stop());
-  //       }
-  //     }
-  //   };
-  // }, []);
+    return () => {
+      if (videoRef.current) {
+        const stream = videoRef.current.srcObject;
+        if (stream) {
+          stream.getTracks().forEach(track => track.stop());
+        }
+      }
+    };
+  }, []);
 
   const validateForm = () => {
     const errors = {};
@@ -1010,7 +1026,7 @@ const CameraView = () => {
                 justifyContent: "center",
               }}
             >
-              {cameraError ? (
+               {cameraError ? (
                 <Box textAlign="center">
                   <VideocamOff sx={{ fontSize: 60, color: "white" }} />
                   <Typography variant="h6" color="error">
@@ -1018,13 +1034,15 @@ const CameraView = () => {
                   </Typography>
                 </Box>
               ) : (
-                <img
-                  id="webcam"
-                  ref={frameRef}
-                  src=""
-                  alt={`Frame`}
-                  style={{ width: "100%", height: "100%" }}
-                />
+                frames && (
+                  <img
+                    id="webcam"
+                    style={{ width: "100%", height: "100%" }}
+                    src={`data:image/jpeg;base64,${frames}`}
+                    alt="Camera Feed"
+                    ref={videoRef}
+                  />
+                )
               )}
               <video ref={videoRef} style={{ display: "none" }} />
               <canvas ref={canvasRef} style={{ display: "none" }} />
