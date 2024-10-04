@@ -69,6 +69,8 @@ const CameraView = () => {
   const [prevLocation, setPrevLocation] = useState("");
   const [currLocation, setCurrLocation] = useState("");
   const [nextLocation, setNextLocation] = useState("");
+  const [gpsSpeed,setGPSSpeed] = useState(0);
+  const [satellites,setSat] = useState(0);
   const ffmpeg = useRef(new FFmpeg()).current;
   const [formValues, setFormValues] = useState({
     trainNo: "", // Added trainNo for the Train/Loco No text field
@@ -306,8 +308,12 @@ const CameraView = () => {
 
       const response = await axios.post(`${apiUrl}/connect_gps`, requestBody);
       if(response){
-        setGPSLang(response.data.longitude);
-        setGPSLat(response.data.latitude);
+        setGPSLang(response?.data?.longitude);
+        setGPSLat(response?.data?.latitude);
+        setSat(response?.data?.satellites);
+        if(response.data.speed){
+          setGPSSpeed(response?.data?.speed)
+        }
       }
    
     } catch (err) {
@@ -1325,7 +1331,7 @@ const CameraView = () => {
                   margin: "10px 0",
                 }}
               >
-                {speed} KM/H
+                {gpsSpeed} KM/H
               </Typography>
 
               <Box
@@ -1373,7 +1379,7 @@ const CameraView = () => {
                     Satellites
                   </Typography>
                 </Box>
-                <Typography style={{ fontSize: "1vw" }}>0</Typography>
+                <Typography style={{ fontSize: "1vw" }}>{satellites}</Typography>
               </Box>
 
               <Box
