@@ -64,7 +64,9 @@ const CameraView = () => {
   const [nextDistance,setNextDistance] = useState(0);
   const [gpsPort, setGpsPort] = useState("");
   const [speed,setSpeed] = useState(0);
+  const [selectedRoute,setSelectedRoute] = useState(null);
   const [openModal, setOpenModal] = useState(true);
+  const [allRoutesData,setAllRoutesData] = useState(null);
   const [ffmpegLoaded, setFfmpegLoaded] = useState(false);
   const [prevLocation, setPrevLocation] = useState("");
   const [currLocation, setCurrLocation] = useState("");
@@ -170,12 +172,13 @@ const CameraView = () => {
     try {
       const response = await axios.get(`${apiUrl}/fetch-route-data`);
       const data = response?.data?.data;
-
+      setAllRoutesData(data);
       // Extract only the Route names
       const routes = [...new Set(data.map((item) => item.Route))];
 
       // Set state with Route names
       setRouteData(routes);
+      
     } catch (err) {}
   };
   useEffect(() => {
@@ -208,6 +211,7 @@ const CameraView = () => {
 
     loadFFmpeg();
   }, [ffmpeg]);
+  
   const handleSubmit = async () => {
     setHasSubmitted(true);
     const errors = validateForm();
@@ -223,16 +227,18 @@ const CameraView = () => {
         await axios.post(`${apiUrl}/set-route`, {
           routeData, // Sending the route in the request body
         });
+        const route = allRoutesData && allRoutesData.find((item) => item.Route === formValues.route);
+        setSelectedRoute(route);
 
         setOpenModal(false);
-        startVideo();
+        //startVideo();
       } catch (error) {
         // Handle any errors that occur during the API call
         console.error("Error submitting form:", error);
       }
     }
   };
-  
+   
   // Fetch the list of connected cameras
   // useEffect(() => {
   //   const getCameras = async () => {
@@ -421,6 +427,7 @@ const CameraView = () => {
   //     frameRef.current.src = `data:image/jpeg;base64,${frameData.frame}`; // Convert the base64 frame to an image source
   //   }
   // }, [frameData]);
+
   const releaseCamera = async () => {
     try {
       
@@ -549,6 +556,7 @@ const CameraView = () => {
     // if(!formValues.route){
     //   return;
     // }
+
     if (videoRef.current && canvasRef.current) {
       const canvas = canvasRef.current;
       const context = canvas.getContext("2d");
@@ -559,10 +567,10 @@ const CameraView = () => {
 
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
       const base64Image = canvas.toDataURL("image/jpeg");
-
+      
       // Remove the prefix from base64 string
       const base64Data = base64Image.replace(/^data:image\/jpeg;base64,/, "");
-   
+       
       // // Send base64 frame to backend
       try {
         const response = await fetch(
@@ -645,6 +653,7 @@ const CameraView = () => {
 
   const startVideo = async () => {
     try {
+    
       // Check if "camera_type" and "resolution" exist in localStorage
       const storedCameraId = localStorage.getItem("camera_type");
       const storedResolution = localStorage.getItem("resolution");
@@ -668,7 +677,7 @@ const CameraView = () => {
       }
   
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
-  
+
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
   
@@ -695,7 +704,7 @@ const CameraView = () => {
       }
     };
   }, []);
-
+ 
   const validateForm = () => {
     const errors = {};
 
@@ -986,14 +995,14 @@ const CameraView = () => {
               color="teal"
               style={{ fontSize: "1vw" }}
             >
-              Section:
+              Section: {selectedRoute?.Section}
             </Typography>
             <Typography
               sx={{ fontWeight: "bold" }}
               color="teal"
               style={{ fontSize: "1vw" }}
             >
-              TRD Feature:
+              TRD Feature: {selectedRoute?.FeatureTRD}
             </Typography>
           </Grid>
           <Grid item md={2} xs={12}>
@@ -1003,7 +1012,8 @@ const CameraView = () => {
               color="teal"
               style={{ fontSize: "1vw" }}
             >
-              ENG. FEATURE
+              ENG. FEATURE : {selectedRoute?.FeatureENG}
+              
             </Typography>
           </Grid>
         </Grid>
@@ -1138,7 +1148,7 @@ const CameraView = () => {
                 <Typography variant="body2" sx={{ color: "white" }}>
                   Section:{" "}
                   <span style={{ color: "teal", fontWeight: 800 }}>
-                    {formValues.route}
+                    {selectedRoute?.Section}
                   </span>
                 </Typography>
                 <Typography variant="body2" sx={{ color: "white" }}>
