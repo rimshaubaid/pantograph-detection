@@ -325,7 +325,7 @@ const CameraView = () => {
       }
    
     } catch (err) {
-      alert(err?.response?.data?.error);
+     // alert(err?.response?.data?.error);
     }
   };
   
@@ -648,6 +648,7 @@ const CameraView = () => {
     }
     if(!isPaused && formValues.route ){
       intervalId = setInterval(captureFrame, 100); // Capture frame every 1 second
+      intervalId = setInterval(connectGPS, 1000); 
     }
 
     return () => clearInterval(intervalId);
