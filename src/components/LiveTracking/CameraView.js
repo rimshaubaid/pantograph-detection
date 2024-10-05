@@ -70,6 +70,7 @@ const CameraView = () => {
   const [ffmpegLoaded, setFfmpegLoaded] = useState(false);
   const [prevLocation, setPrevLocation] = useState("");
   const [currLocation, setCurrLocation] = useState("");
+  const [altitude,setAlt] = useState(0);
   const [nextLocation, setNextLocation] = useState("");
   const [gpsSpeed,setGPSSpeed] = useState(0);
   const [satellites,setSat] = useState(0);
@@ -317,6 +318,7 @@ const CameraView = () => {
         setGPSLang(response?.data?.longitude);
         setGPSLat(response?.data?.latitude);
         setSat(response?.data?.satellites);
+        setAlt(response?.data?.altitude);
         if(response.data.speed){
           setGPSSpeed(response?.data?.speed)
         }
@@ -1431,7 +1433,7 @@ const CameraView = () => {
                   <Height sx={{ marginRight: 1 }} />
                   <Typography style={{ fontSize: "1vw" }}>Altitude</Typography>
                 </Box>
-                <Typography style={{ fontSize: "1vw" }}>0</Typography>
+                <Typography style={{ fontSize: "1vw" }}>{altitude}</Typography>
               </Box>
               <Typography
                 style={{ fontSize: "1vw" }}
