@@ -232,7 +232,7 @@ const CameraView = () => {
         setSelectedRoute(route);
 
         setOpenModal(false);
-        //startVideo();
+        startVideo();
       } catch (error) {
         // Handle any errors that occur during the API call
         console.error("Error submitting form:", error);
