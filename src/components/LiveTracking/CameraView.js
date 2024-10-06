@@ -648,7 +648,7 @@ const CameraView = () => {
     }
     if(!isPaused && formValues.route ){
       intervalId = setInterval(captureFrame, 100); // Capture frame every 1 second
-      intervalId = setInterval(connectGPS, 1000); 
+     // intervalId = setInterval(connectGPS, 1000); 
     }
 
     return () => clearInterval(intervalId);
