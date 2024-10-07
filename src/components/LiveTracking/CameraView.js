@@ -384,20 +384,20 @@ const CameraView = () => {
       try {
        // console.log('event!1',event)
         const data = JSON.parse(event.data);
-        //console.log('data',data)
+        console.log('data',data?.metadata)
         if (data.frame) {
         //  console.log('dd',data.frame)
           setCurrentFrame(data.frame);
-          setContactPoints(data.contact_points);
-          setHeight(data.pantograph_height);
-          setLang(data.longitude);
-          setLat(data.latitude);
-          setCurrLocation(data.current_location);
-          setPrevLocation(data.previous_location);
-          setNextLocation(data.next_location);
-          setPrevDistance(data.previous_distance);
-          setNextDistance(data.next_distance);
-          setSpeed(data.speed_kmh);
+          setContactPoints(data?.metadata?.contact_points);
+          setHeight(data?.metadata?.pantograph_height);
+          setLang(data?.metadata?.longitude);
+          setLat(data?.metadata?.latitude);
+          setCurrLocation(data?.metadata?.current_location);
+          setPrevLocation(data?.metadata?.previous_location);
+          setNextLocation(data?.metadata?.next_location);
+          setPrevDistance(data?.metadata?.previous_distance);
+          setNextDistance(data?.metadata?.next_distance);
+          setSpeed(data?.metadata?.speed_kmh);
         }
       } catch (error) {
         console.error("Error parsing event data:", error);
@@ -414,7 +414,7 @@ const CameraView = () => {
       frameRef.current.src = `data:image/jpeg;base64,${currentFrame}`;
     }
   }, [currentFrame]);
-  console.log('curr',currentFrame)
+  //console.log('curr',currentFrame)
   const [frameData, setFrameData] = useState(null); // State to hold the frame data
 
   useEffect(() => {
