@@ -260,22 +260,22 @@ const CameraView = () => {
   
   // }, []);
 
-  // useEffect(() => {
-  //   //if camera isnt selected
-  //   const cam = localStorage.getItem("deviceId");
-  //   const res = localStorage.getItem("resolution");
+  useEffect(() => {
+    //if camera isnt selected
+    const cam = localStorage.getItem("deviceId");
+    const res = localStorage.getItem("resolution");
     
-  //   if (!cam) {
-  //     setSelectedCamera(0);
-  //   } else {
-  //     setSelectedCamera(cam);
-  //   }
-  //   if (res) {
-  //     setSelectedResolution(res);
-  //   } else {
-  //     setSelectedResolution("640x480");
-  //   }
-  // }, []);
+    if (!cam) {
+      setSelectedCamera(0);
+    } else {
+      setSelectedCamera(cam);
+    }
+    if (res) {
+      setSelectedResolution(res);
+    } else {
+      setSelectedResolution("640x480");
+    }
+  }, []);
 
   // useEffect(() => {
   //   // Fetch the list of connected cameras
@@ -384,7 +384,7 @@ const CameraView = () => {
       try {
        // console.log('event!1',event)
         const data = JSON.parse(event.data);
-        console.log('data',data?.metadata)
+       // console.log('data',data?.metadata)
         if (data.frame) {
         //  console.log('dd',data.frame)
           setCurrentFrame(data.frame);
@@ -718,9 +718,9 @@ const CameraView = () => {
       //   constraints.video.deviceId = { exact: storedCameraId };
       // }
 
-      const response = await axios.post(`http://127.0.0.1:5000/start-camera?camera_index=0&route=${formValues.route}`);
+      const response = await axios.post(`http://127.0.0.1:5000/start-camera?camera_index=${selectedCamera}&route=${formValues.route}`);
       handleFrames();
-      console.log('res',response);
+     //console.log('res',response);
       //const stream = await navigator.mediaDevices.getUserMedia(constraints);
 
       // if (videoRef.current) {
